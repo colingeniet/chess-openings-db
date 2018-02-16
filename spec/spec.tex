@@ -1,0 +1,120 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\usepackage{tikz-er2}
+\usetikzlibrary{positioning}
+\usetikzlibrary{shadows}
+
+
+\begin{document}
+\title{Chess Openings Database Specification}
+\author{Yoan Geran \and Colin Geniet}
+\maketitle
+
+\begin{abstract}
+This is the specification for a database of chess games, mainly aimed at
+the study of openings.
+\end{abstract}
+
+\tableofcontents
+
+\section{Informal specification}
+The general goal of this project is to allow the user to study chess openings
+with the help of a large chess games database.
+
+For that purpose, the main feature of the database is to allow searching
+in the games database for games starting with a specific moves sequence
+inputted by the user.
+More specifically, the search result will include the followings :
+\begin{itemize}
+\item Statistics on games matching the criteria, that is number of games and
+win rates for each side (white/black).
+\item Most frequent move after this initial sequence.
+\end{itemize}
+
+
+
+
+
+
+
+\newpage
+
+The goal is to allow users to search in a database of chess games based on
+various criteria, and to gather statistics about those games.
+
+For each game in the database, the sequence of moves is recorded, as well as 
+the result, players, date, location, event...
+
+Chess players can also be registered with additional informations : name,
+ELO rating, nationality...
+
+The user can search games starting with a specific sequence of moves, and
+add filters on game and players attributes : (game date and location,
+players names, ELO, nationality ...).
+
+The result of the search is :
+\begin{itemize}
+\item The number of games matching the criteria.
+\item Win/loss/draw frequency those games.
+\item Most used openings in those games.
+\item Some games matching the criteria.
+\item Most used move after the initial input sequence.
+\end{itemize}
+
+Examples of use case :
+\begin{itemize}
+\item The user inputs a sequence of moves. The search result is : how many games use this sequence,
+how often each player wins when using it, and what is the most common way to
+continue the game, as well as possibly openings starting with this sequence, if any.
+\end{itemize}
+
+Additionally, openings characterized by a sequence of moves can be recorded, and
+used when searching, instead of manually inputting a move sequence. 
+Any opening can also have variations, that continue the sequence of moves
+defined by the opening. Variations can be seen as more specific openings, and
+may have subvariations.
+
+
+Users will be able to add new games, new players and new openings in the database. 
+
+
+\tikzstyle{every entity} = [top color=white, bottom color=blue!30, 
+                            draw=blue!50!black!100, drop shadow]
+\tikzstyle{every weak entity} = [drop shadow={shadow xshift=.7ex, 
+                                 shadow yshift=-.7ex}]
+\tikzstyle{every attribute} = [top color=white, bottom color=yellow!20, 
+                               draw=yellow, node distance=1cm, drop shadow]
+\tikzstyle{every relationship} = [top color=white, bottom color=red!20, 
+                                  draw=red!50!black!100, drop shadow]
+\tikzstyle{every isa} = [top color=white, bottom color=green!20, 
+                         draw=green!50!black!100, drop shadow]
+
+\begin{center}
+\begin{tikzpicture}[every edge/.style={link}]
+    \node[entity] (game) {Game};
+    \node[attribute] (gdate) [above= 1.5cm of game] {date} edge (game);
+    \node[attribute] (gid) [above left= 1.4cm and 0cm of game] {\key{id}} edge (game);
+    
+    \node[relationship] (white) [below right= 0cm and 1cm of game] {white} edge node [auto] {1} (game);
+    \node[relationship] (black) [above right= 0cm and 1cm of game] {black} edge node [auto,swap] {1} (game);
+    \node[entity] (player) [above right= 0cm and 1cm of white] {Player} edge (white);
+    \draw[link] (player) edge (black);
+    
+    \node[relationship] (gevent) [left= of game] {in event} edge node [auto] {1} (game);
+    \node[entity] (event) [left= of gevent] {Event} edge (gevent);
+    
+    \node[relationship] (gopening) [below= of game] {opening} edge (game);
+    \node[entity] (opening) [below= of gopening] {Opening} edge (gopening);
+    \node[relationship] (variation) [left= of opening] {variation};
+    \draw[link] (opening.172) edge (variation.10);
+    \draw[link] (opening.-172) edge (variation.-10);
+    
+    
+\end{tikzpicture}
+\end{center}
+
+
+\end{document}
