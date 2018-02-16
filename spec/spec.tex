@@ -21,65 +21,38 @@ the study of openings.
 \tableofcontents
 
 \section{Informal specification}
-The general goal of this project is to allow the user to study chess openings
+The general goal of this project is to allow users to study chess openings
 with the help of a large chess games database.
 
 For that purpose, the main feature of the database is to allow searching
 in the games database for games starting with a specific moves sequence
-inputted by the user.
+inputted by users.
 More specifically, the search result will include the followings :
 \begin{itemize}
 \item Statistics on games matching the criteria, that is number of games and
 win rates for each side (white/black).
 \item Most frequent move after this initial sequence.
-\end{itemize}
-
-
-
-
-
-
-
-\newpage
-
-The goal is to allow users to search in a database of chess games based on
-various criteria, and to gather statistics about those games.
-
-For each game in the database, the sequence of moves is recorded, as well as 
-the result, players, date, location, event...
-
-Chess players can also be registered with additional informations : name,
-ELO rating, nationality...
-
-The user can search games starting with a specific sequence of moves, and
-add filters on game and players attributes : (game date and location,
-players names, ELO, nationality ...).
-
-The result of the search is :
-\begin{itemize}
-\item The number of games matching the criteria.
-\item Win/loss/draw frequency those games.
 \item Most used openings in those games.
-\item Some games matching the criteria.
-\item Most used move after the initial input sequence.
+\item Some games matching those criteria (maybe sorted by ELO rating).
 \end{itemize}
 
-Examples of use case :
-\begin{itemize}
-\item The user inputs a sequence of moves. The search result is : how many games use this sequence,
-how often each player wins when using it, and what is the most common way to
-continue the game, as well as possibly openings starting with this sequence, if any.
-\end{itemize}
+Searches can be further refined using additional restraints on game date, location,
+event, and players name, ELO rating, nationality.
 
-Additionally, openings characterized by a sequence of moves can be recorded, and
-used when searching, instead of manually inputting a move sequence. 
-Any opening can also have variations, that continue the sequence of moves
-defined by the opening. Variations can be seen as more specific openings, and
-may have subvariations.
+Users may also look at specific games.
+When looking at a game, users may go through the game moves,
+see openings matching the game and download the game as a \verb|.pgn| file.
+
+Openings, characterized by an initial moves sequence, may be used when searching
+instead of manually inputting a move sequence.
+Openings may have variations, that is more specific openings.
+
+Users may register accounts. Registered users may add new games (manually or using \verb|.pgn| files),
+players, events and openings to the database. They may edit any of the above if it was
+created by themselves. They may also add comments on any game or opening.
 
 
-Users will be able to add new games, new players and new openings in the database. 
-
+\section{Entity relationship}
 
 \tikzstyle{every entity} = [top color=white, bottom color=blue!30, 
                             draw=blue!50!black!100, drop shadow]
