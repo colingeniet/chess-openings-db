@@ -68,27 +68,40 @@ created by themselves. They may also add comments on any game or opening.
                          draw=green!50!black!100, drop shadow]
 
 \begin{center}
+\scalebox{.80}{
 \begin{tikzpicture}[every edge/.style={link}]
     \node[entity] (game) {Game};
-    \node[attribute] (gdate) [above= 1.5cm of game] {date} edge (game);
-    \node[attribute] (gid) [above left= 1.4cm and 0cm of game] {\key{id}} edge (game);
+    %\node[attribute] (gdate) [above= 1.5cm of game] {date} edge (game);
+    %\node[attribute] (gid) [above left= 1.4cm and 0cm of game] {\key{id}} edge (game);
     
     \node[relationship] (white) [below right= 0cm and 1cm of game] {white} edge node [auto] {1} (game);
     \node[relationship] (black) [above right= 0cm and 1cm of game] {black} edge node [auto,swap] {1} (game);
     \node[entity] (player) [above right= 0cm and 1cm of white] {Player} edge (white);
     \draw[link] (player) edge (black);
     
-    \node[relationship] (gevent) [left= of game] {in event} edge node [auto] {1} (game);
-    \node[entity] (event) [left= of gevent] {Event} edge (gevent);
+    \node[relationship] (gevent) [above left= 1cm and 0cm of game] {in event} edge node [auto] {1} (game);
+    \node[entity] (event) [left= 0.5cm of gevent] {Event} edge (gevent);
     
-    \node[relationship] (gopening) [below= of game] {opening} edge (game);
-    \node[entity] (opening) [below= of gopening] {Opening} edge (gopening);
-    \node[relationship] (variation) [left= of opening] {variation};
-    \draw[link] (opening.172) edge (variation.10);
-    \draw[link] (opening.-172) edge (variation.-10);
+    \node[relationship] (gopening) [left= 5cm of game] {opening} edge (game);
+    \node[entity] (opening) [above= 1cm of gopening] {Opening} edge (gopening);
+    \node[relationship] (variation) [above= 0.5cm of opening] {variation};
+    \draw[link] (opening.70) edge (variation.283);
+    \draw[link] (opening.110) edge (variation.257);
+    
+    \node[draw,circle,top color=white, bottom color=green!20, draw=green!50!black!100, drop shadow] (obj_is) 
+         [above= 5cm of game] {D} edge (game) edge (opening) edge (event) edge (player);
+    \node[entity] (object) [above= 1cm of obj_is] {Object} edge node {$\bigcup$} (obj_is);
+    
+    \node[relationship] (owns) [left= of object] {owns} edge [total] (object);
+    \node[entity] (user) [left= of owns] {User} edge (owns);
+    
+    \node[relationship] (on) [above= 1cm of object] {on} edge (object);
+    \node[entity] (comment) [left= of on] {Comment} edge [total] node [auto] {1} (on);
+    \node[relationship] (from) [above= 0.8cm of user] {from} edge (user) edge [total] node [auto] {1} (comment);
     
     
 \end{tikzpicture}
+}
 \end{center}
 
 
