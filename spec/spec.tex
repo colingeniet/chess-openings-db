@@ -95,7 +95,7 @@ created by themselves. They may also add comments on any game, opening, \dots
 }
 \end{center}
 
-\begin{table}[h!]
+\begin{table}[ht!]
     \begin{subtable}{3.5cm}
 	\begin{tabular}[t]{|cr|}
 	\hline
@@ -104,6 +104,7 @@ created by themselves. They may also add comments on any game, opening, \dots
 	id     & \em{primary key} \\
 	moves  &                  \\
 	date   & \em{optional}    \\
+	site   & \em{optional}    \\
 	result &                  \\
 	\hline
 	\end{tabular}
@@ -136,7 +137,7 @@ created by themselves. They may also add comments on any game, opening, \dots
     \end{subtable}
 \end{table}
     
-\begin{table}[h!]
+\begin{table}[ht!]
     \begin{subtable}{3.5cm}
 	\begin{tabular}[t]{|cr|}
 	\hline
@@ -177,6 +178,52 @@ created by themselves. They may also add comments on any game, opening, \dots
 
 
 \subsection{Integrity Constraint}
+\paragraph{Moves}
+\verb|moves| attributes in entities \verb|Game| and \verb|Opening| must represent
+valid sequence of chess moves starting from the initial chess position.
+
+
+\section{Documentation}
+\subsection{Data representation}
+\subsubsection{Chess moves}
+Obviously, chess moves will be a very important --- and big --- part of this database.
+Thus, finding an efficient representation for them is important.
+The one we settled for is to represent any of the 64 squares by a character (ASCII).
+A move is represented by two character, and a sequence of moves by a string.
+
+While not human readable, this representation is quite compact, totally unambiguous,
+with only one representation for any given move, and uses has constant representation
+size for a move.
+
+All this advantages are important when searching in the database for games starting
+with a given move sequence, as the search is simply a prefix lookup.
+
+The other representation we considered are :
+\begin{itemize}
+\item Algebraic notation is the most standard, but has problems with ambiguity
+(two valid strings can represent the same move), making search much more complicated.
+Additionally, it uses more space, and it has non-constant representation size.
+
+\item Representing the start and end squares in plain text mostly keeps the advantages
+of our representation while being human readable. However, it do uses twice more space.
+Since having a human readable internal representation is not very useful,
+we ruled it out.
+\end{itemize}
+
+
+\paragraph{Detailed representation}
+Chess board squares are numbered from left to right, and from bottom to top,
+starting with 0. Thus, \verb|a1| is numbered as 0, \verb|a8| as 7, \verb|b1| as 8, \dots
+The square number is directly encoded in the six lower end bits of a byte, which is considered as a character.
+
+For promotions, the two remaining higher end bits of the end square are used to represent the piece promoted to,
+encoded as Queen=0, Knight=1, Rook=2, Bishop=3.
+For instance, a pawn promoting on column \verb|a| will be represented as 6--7 for a queen promotion,
+6--71 for a Knight promotion, 6--135 for a Rook promotion, \dots.
+
+Note that castling is represented by the King move.
+
+\section{Functional Analysis}
 
 
 
