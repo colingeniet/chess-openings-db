@@ -7,16 +7,13 @@
 \usetikzlibrary{positioning}
 \usetikzlibrary{shadows}
 
+\usepackage{subcaption}
+
 
 \begin{document}
 \title{Chess Openings Database Specification}
 \author{Yoan Geran \and Colin Geniet}
 \maketitle
-
-\begin{abstract}
-This is the specification for a database of chess games, mainly aimed at
-the study of openings.
-\end{abstract}
 
 \tableofcontents
 
@@ -50,11 +47,11 @@ Openings may have variations, that is more specific openings.
 
 Users may register accounts. Registered users may add new games (manually or using \verb|.pgn| files),
 players, events and openings to the database. They may edit any of the above if it was
-created by themselves. They may also add comments on any game or opening.
+created by themselves. They may also add comments on any game, opening, \dots
 
 
-
-\section{Entity relationship}
+\section{Conceptual Analysis}
+\subsection{Entity relationship}
 
 \tikzstyle{every entity} = [top color=white, bottom color=blue!30, 
                             draw=blue!50!black!100, drop shadow]
@@ -64,15 +61,11 @@ created by themselves. They may also add comments on any game or opening.
                                draw=yellow, node distance=1cm, drop shadow]
 \tikzstyle{every relationship} = [top color=white, bottom color=red!20, 
                                   draw=red!50!black!100, drop shadow]
-\tikzstyle{every isa} = [top color=white, bottom color=green!20, 
-                         draw=green!50!black!100, drop shadow]
 
 \begin{center}
 \scalebox{.80}{
 \begin{tikzpicture}[every edge/.style={link}]
     \node[entity] (game) {Game};
-    %\node[attribute] (gdate) [above= 1.5cm of game] {date} edge (game);
-    %\node[attribute] (gid) [above left= 1.4cm and 0cm of game] {\key{id}} edge (game);
     
     \node[relationship] (white) [below right= 0cm and 1cm of game] {white} edge node [auto] {1} (game);
     \node[relationship] (black) [above right= 0cm and 1cm of game] {black} edge node [auto,swap] {1} (game);
@@ -98,11 +91,93 @@ created by themselves. They may also add comments on any game or opening.
     \node[relationship] (on) [above= 1cm of object] {on} edge (object);
     \node[entity] (comment) [left= of on] {Comment} edge [total] node [auto] {1} (on);
     \node[relationship] (from) [above= 0.8cm of user] {from} edge (user) edge [total] node [auto] {1} (comment);
-    
-    
 \end{tikzpicture}
 }
 \end{center}
+
+\begin{table}[h!]
+    \begin{subtable}{3.5cm}
+	\begin{tabular}[t]{|cr|}
+	\hline
+	\multicolumn{2}{|c|}{\textbf{Game}} \\
+	\hline 
+	id     & \em{primary key} \\
+	moves  &                  \\
+	date   & \em{optional}    \\
+	result &                  \\
+	\hline
+	\end{tabular}
+    \end{subtable}
+    ~
+    \begin{subtable}{5cm}
+	\begin{tabular}[t]{|cr|}
+	\hline
+	\multicolumn{2}{|c|}{\textbf{Player}} \\
+	\hline 
+	id              & \em{primary key} \\
+	first name      &                  \\
+	last name       &                  \\
+	FIDE Elo rating & \em{optional}    \\
+	nationality     & \em{optional}    \\
+	\hline
+	\end{tabular}
+    \end{subtable}
+    ~
+    \begin{subtable}{3cm}
+	\begin{tabular}[t]{|cr|}
+	\hline
+	\multicolumn{2}{|c|}{\textbf{Opening}} \\
+	\hline 
+	id     & \em{primary key} \\
+	moves  &                  \\
+	name   &                  \\
+	\hline
+	\end{tabular}
+    \end{subtable}
+\end{table}
+    
+\begin{table}[h!]
+    \begin{subtable}{3.5cm}
+	\begin{tabular}[t]{|cr|}
+	\hline
+	\multicolumn{2}{|c|}{\textbf{Event}} \\
+	\hline
+	id     & \em{primary key} \\
+	name   &                  \\
+	start  & \em{optional}    \\
+	end    & \em{optional}    \\
+	\hline
+	\end{tabular}
+    \end{subtable}
+    ~
+    \begin{subtable}{4cm}
+	\begin{tabular}[t]{|cr|}
+	\hline
+	\multicolumn{2}{|c|}{\textbf{User}} \\
+	\hline
+	id       & \em{primary key} \\
+	name     & \em{key}         \\
+	password &                  \\
+	\hline
+	\end{tabular}
+    \end{subtable}
+    ~
+    \begin{subtable}{3.5cm}
+	\begin{tabular}[t]{|cr|}
+	\hline
+	\multicolumn{2}{|c|}{\textbf{Comment}} \\
+	\hline
+	id     & \em{primary key} \\
+	text   &                  \\
+	date   &                  \\
+	\hline
+	\end{tabular}
+    \end{subtable}
+\end{table}
+
+
+\subsection{Integrity Constraint}
+
 
 
 \end{document}
