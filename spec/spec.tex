@@ -76,7 +76,7 @@ See attributes below [\ref{attr}].
     \node[relationship] (gevent) [above left= 1cm and 0cm of game] {in event} edge node [auto] {1} (game);
     \node[entity] (event) [left= 0.5cm of gevent] {Event} edge (gevent);
     
-    \node[relationship] (gopening) [left= 5cm of game] {opening} edge (game);
+    \node[relationship] (gopening) [left= 5cm of game] {played in} edge (game);
     \node[entity] (opening) [above= 1cm of gopening] {Opening} edge (gopening);
     \node[relationship] (variation) [above= 0.5cm of opening] {variation};
     \draw[link] (opening.70) edge (variation.283);
@@ -86,7 +86,7 @@ See attributes below [\ref{attr}].
          [above= 5cm of game] {D} edge (game) edge (opening) edge (event) edge (player);
     \node[entity] (object) [above= 1cm of obj_is] {Object} edge node {$\bigcup$} (obj_is);
     
-    \node[relationship] (owns) [left= of object] {owns} edge (object);
+    \node[relationship] (owns) [left= of object] {can edit} edge (object);
     \node[entity] (user) [left= of owns] {User} edge (owns);
     
     \node[relationship] (on) [above= 1cm of object] {on} edge (object);
