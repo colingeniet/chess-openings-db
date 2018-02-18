@@ -99,9 +99,18 @@ created by themselves. They may also add comments on any game, opening, \dots
     \begin{subtable}{3.5cm}
 	\begin{tabular}[t]{|cr|}
 	\hline
+	\multicolumn{2}{|c|}{\textbf{Object}} \\
+	\hline 
+	id & \em{primary key} \\
+	\hline
+	\end{tabular}
+    \end{subtable}
+    ~
+    \begin{subtable}{3.5cm}
+	\begin{tabular}[t]{|cr|}
+	\hline
 	\multicolumn{2}{|c|}{\textbf{Game}} \\
 	\hline 
-	id     & \em{primary key} \\
 	moves  &                  \\
 	date   & \em{optional}    \\
 	site   & \em{optional}    \\
@@ -110,40 +119,35 @@ created by themselves. They may also add comments on any game, opening, \dots
 	\end{tabular}
     \end{subtable}
     ~
-    \begin{subtable}{5cm}
+    \begin{subtable}{3.5cm}
 	\begin{tabular}[t]{|cr|}
 	\hline
 	\multicolumn{2}{|c|}{\textbf{Player}} \\
 	\hline 
-	id              & \em{primary key} \\
-	first name      &                  \\
-	last name       &                  \\
-	FIDE Elo rating & \em{optional}    \\
-	nationality     & \em{optional}    \\
+	first name   &                  \\
+	last name    &                  \\
+	Elo rating   & \em{optional}    \\
+	nationality  & \em{optional}    \\
 	\hline
 	\end{tabular}
     \end{subtable}
     ~
-    \begin{subtable}{3cm}
+    \begin{subtable}{3.5cm}
 	\begin{tabular}[t]{|cr|}
 	\hline
 	\multicolumn{2}{|c|}{\textbf{Opening}} \\
-	\hline 
-	id     & \em{primary key} \\
+	\hline
 	moves  &                  \\
 	name   &                  \\
 	\hline
 	\end{tabular}
     \end{subtable}
-\end{table}
-    
-\begin{table}[ht!]
+    ~
     \begin{subtable}{3.5cm}
 	\begin{tabular}[t]{|cr|}
 	\hline
 	\multicolumn{2}{|c|}{\textbf{Event}} \\
 	\hline
-	id     & \em{primary key} \\
 	name   &                  \\
 	start  & \em{optional}    \\
 	end    & \em{optional}    \\
@@ -151,7 +155,7 @@ created by themselves. They may also add comments on any game, opening, \dots
 	\end{tabular}
     \end{subtable}
     ~
-    \begin{subtable}{4cm}
+    \begin{subtable}{3.5cm}
 	\begin{tabular}[t]{|cr|}
 	\hline
 	\multicolumn{2}{|c|}{\textbf{User}} \\
