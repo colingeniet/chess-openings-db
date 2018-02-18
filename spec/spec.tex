@@ -185,7 +185,7 @@ See attributes below [\ref{attr}].
 \end{table}
 
 
-\subsection{Integrity Constraint}
+\subsection{Integrity Constraints}
 \begin{itemize}
 \item \verb|moves| attributes in entities \verb|Game| and \verb|Opening| must represent
 valid sequences of chess moves starting from the initial chess position.
@@ -200,8 +200,7 @@ with the move sequence of $B$.
 
 
 
-\section{Documentation}
-\subsection{}
+\section{Design choices}
 
 \subsection{Relationship cardinalities}
 While some cardinality constraints on relationships may seem too weak,
@@ -222,8 +221,7 @@ For instance, a comment on an object is not affected in any way by the exact typ
 Thus, comments are linked to \verb|Object| entities, and not directly to a \verb|Game| etc.
 Similarly, the ownership notion is independent from the object.
 
-\subsection{Data representation}
-\subsubsection{Chess moves}
+\subsection{Chess moves representation}
 Obviously, chess moves will be a very important --- and big --- part of this database.
 Thus, finding an efficient representation for them is important.
 The one we settled for is to represent any of the 64 squares by a character (ASCII).
@@ -263,6 +261,20 @@ Note that castling is represented by the King move.
 
 
 \section{Functional Analysis}
+\subsection{Search}
+
+\subsection{Database modification}
+An user can create an account, which creates a corresponding \verb|User| entity.
+A registered user can then add new games, players, openings and events to the database.
+\begin{itemize}
+\item Games can be added manually, or imported from a \verb|pgn| file.
+\item Openings may be created from scratch, or as variations on an existing opening.
+\end{itemize}
+
+Users automatically obtain edit rights on any object they created.
+Users can modify or delete any object they have edit rights on.
+
+Any registered user can post comments on any object.
 
 
 
