@@ -52,6 +52,7 @@ created by themselves. They may also add comments on any game, opening, \dots
 
 \section{Conceptual Analysis}
 \subsection{Entity relationship}
+See attributes below [\ref{attr}].
 
 \tikzstyle{every entity} = [top color=white, bottom color=blue!30, 
                             draw=blue!50!black!100, drop shadow]
@@ -85,7 +86,7 @@ created by themselves. They may also add comments on any game, opening, \dots
          [above= 5cm of game] {D} edge (game) edge (opening) edge (event) edge (player);
     \node[entity] (object) [above= 1cm of obj_is] {Object} edge node {$\bigcup$} (obj_is);
     
-    \node[relationship] (owns) [left= of object] {owns} edge [total] (object);
+    \node[relationship] (owns) [left= of object] {owns} edge (object);
     \node[entity] (user) [left= of owns] {User} edge (owns);
     
     \node[relationship] (on) [above= 1cm of object] {on} edge (object);
@@ -96,6 +97,9 @@ created by themselves. They may also add comments on any game, opening, \dots
 \end{center}
 
 \begin{table}[ht!]
+    \caption{Entity attributes}
+    \label{attr}
+    
     \begin{subtable}{3.5cm}
 	\begin{tabular}[t]{|cr|}
 	\hline
@@ -182,12 +186,34 @@ created by themselves. They may also add comments on any game, opening, \dots
 
 
 \subsection{Integrity Constraint}
-\paragraph{Moves}
-\verb|moves| attributes in entities \verb|Game| and \verb|Opening| must represent
-valid sequence of chess moves starting from the initial chess position.
+\begin{itemize}
+\item \verb|moves| attributes in entities \verb|Game| and \verb|Opening| must represent
+valid sequences of chess moves starting from the initial chess position.
+
+\item Relationships \verb|opening| and \verb|variation| must respect the values of \verb|moves|
+attributes in respective entities.
+Precisely, opening $A$ is a variation on opening $B$ if and only if the move sequence
+of $A$ starts (in the prefix meaning) with the move sequence of $B$.
+Similarly, game $A$ has $B$ as an opening if the move sequence of $A$ starts
+with the move sequence of $B$.
+\end{itemize}
+
 
 
 \section{Documentation}
+\subsection{}
+
+\subsection{Relationship cardinalities}
+
+\subsection{The \texttt{Object} entity}
+The \verb|Object| entity regroups all objects that can be manipulated (i.e.\ created, modified, commented \dots) by users,
+that is games, openings, events, \dots
+Its use abstracts manipulation operations, when they are independent from the precise entity.
+
+For instance, a comment on an object is not affected in any way by the exact type this object.
+Thus, comments are linked to \verb|Object| entities, and not directly to a \verb|Game| etc.
+Similarly, the ownership notion is independent from the object.
+
 \subsection{Data representation}
 \subsubsection{Chess moves}
 Obviously, chess moves will be a very important --- and big --- part of this database.
@@ -226,6 +252,7 @@ For instance, a pawn promoting on column \verb|a| will be represented as 6--7 fo
 6--71 for a Knight promotion, 6--135 for a Rook promotion, \dots.
 
 Note that castling is represented by the King move.
+
 
 \section{Functional Analysis}
 
