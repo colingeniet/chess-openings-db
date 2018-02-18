@@ -194,7 +194,7 @@ valid sequences of chess moves starting from the initial chess position.
 attributes in respective entities.
 Precisely, opening $A$ is a variation on opening $B$ if and only if the move sequence
 of $A$ starts (in the prefix meaning) with the move sequence of $B$.
-Similarly, game $A$ has $B$ as an opening if the move sequence of $A$ starts
+Similarly, game $A$ has $B$ as an opening if and only if the move sequence of $A$ starts
 with the move sequence of $B$.
 \end{itemize}
 
@@ -204,6 +204,14 @@ with the move sequence of $B$.
 \subsection{}
 
 \subsection{Relationship cardinalities}
+While some cardinality constraints on relationships may seem too weak,
+they are justified by special cases. For instance :
+\begin{itemize}
+\item \verb|white| and \verb|black| relationships need not to be total with regard to the game, as players may be unknown.
+
+\item \verb|opening| relationship is neither total nor limited with regard to the game,
+as a game may match several openings (an opening and its variation), or none if played with unconventional opening.
+\end{itemize}
 
 \subsection{The \texttt{Object} entity}
 The \verb|Object| entity regroups all objects that can be manipulated (i.e.\ created, modified, commented \dots) by users,
