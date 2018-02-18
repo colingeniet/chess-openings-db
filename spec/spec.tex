@@ -8,6 +8,7 @@
 \usetikzlibrary{shadows}
 
 \usepackage{subcaption}
+\usepackage{enumitem}
 
 
 \begin{document}
@@ -25,7 +26,7 @@ For that purpose, the main feature of the database is to allow searching
 in the games database for games starting with a specific moves sequence
 inputted by users.
 More specifically, the search result will include the followings :
-\begin{itemize}
+\begin{itemize}[noitemsep]
 \item Statistics on games matching the criteria, that is number of games and
 win rates for each side (white/black).
 \item Most frequent move after this initial sequence.
@@ -115,10 +116,10 @@ See attributes below [\ref{attr}].
 	\hline
 	\multicolumn{2}{|c|}{\textbf{Game}} \\
 	\hline 
-	moves  &                  \\
-	date   & \em{optional}    \\
-	site   & \em{optional}    \\
-	result &                  \\
+	moves    &                  \\
+	date     & \em{optional}    \\
+	location & \em{optional}    \\
+	result   &                  \\
 	\hline
 	\end{tabular}
     \end{subtable}
@@ -152,9 +153,10 @@ See attributes below [\ref{attr}].
 	\hline
 	\multicolumn{2}{|c|}{\textbf{Event}} \\
 	\hline
-	name   &                  \\
-	start  & \em{optional}    \\
-	end    & \em{optional}    \\
+	name     &                  \\
+	location & \em{optional}    \\
+	start    & \em{optional}    \\
+	end      & \em{optional}    \\
 	\hline
 	\end{tabular}
     \end{subtable}
@@ -262,6 +264,46 @@ Note that castling is represented by the King move.
 
 \section{Functional Analysis}
 \subsection{Search}
+Any user can search the database to obtain a list of games matching some criteria.
+Criteria are :
+\begin{itemize}[noitemsep]
+\item A sequence of moves that must match the beginning of the game.
+\item Games using a given opening (used instead of a sequence of moves).
+\item The players names/nationality. This criteria can be set for any side
+(e.g.\ played by R.J.Fischer) or a specific one (e.g.\ black from Russia)
+\item Game date (e.g. played after Jan. 20, 2001)
+\item Event
+\item Location
+\end{itemize}
+
+In addition to the list of games, the search results includes the followings :
+\begin{itemize}[noitemsep]
+\item Number of matching games.
+\item Win frequency for each player, and draw frequency.
+\item Openings matching the initial sequence of moves.
+When using an opening as search criteria, this means less specific openings.
+\item Most used move and opening (after the initial sequence of moves/opening, if any).
+\end{itemize}
+
+Users can select games, openings, players or events to view details.
+\begin{itemize}
+\item For games, the game moves can be viewed, as well as result, players, date, location, event,
+and matching opening(s).
+\item For openings, the opening moves can be viewed, as well as more generic openings, variations, name
+and games using this opening.
+\item For players, the name, nationality and Elo rating and list of games can be viewed.
+\item For events, the name, location, date and list of games can be viewed.
+\end{itemize}
+
+Obviously, lists are not fully displayed if too big.
+They are sorted by :
+\begin{itemize}[noitemsep]
+\item Number of matching games for openings.
+\item Players Elo rating for games.
+\item Elo rating for players.
+\item Date (most recent) for events.
+\end{itemize}
+
 
 \subsection{Database modification}
 An user can create an account, which creates a corresponding \verb|User| entity.
