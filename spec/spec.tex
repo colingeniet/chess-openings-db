@@ -12,6 +12,7 @@
 \usepackage{hyperref}
 
 
+
 \begin{document}
 \title{Chess Openings Database Specification}
 \author{Yoan Geran \and Colin Geniet}
@@ -85,11 +86,12 @@ See attributes below [\ref{attr}].
     \draw[link] (opening.110) edge (variation.257);
     
     \node[draw,circle,top color=white, bottom color=green!20, draw=green!50!black!100, drop shadow] (obj_is) 
-         [above= 5cm of game] {D} edge (game) edge (opening) edge (event) edge (player);
+         [above= 6cm of game] {D} edge (game) edge (opening) edge (event) edge (player);
     \node[entity] (object) [above= 1cm of obj_is] {Object} edge node {$\bigcup$} (obj_is);
     
-    \node[relationship] (owns) [left= of object] {can edit} edge (object);
+    \node[relationship] (owns) [left= of object] {owns} edge [total] node [auto] {1} (object);
     \node[entity] (user) [left= of owns] {User} edge (owns);
+    \node[relationship] (edit) [below left= 1cm and 1.2cm of object] {can edit} edge [total] (object) edge (user);
     
     \node[relationship] (on) [above= 1cm of object] {on} edge (object);
     \node[entity] (comment) [left= of on] {Comment} edge [total] node [auto] {1} (on);
@@ -203,6 +205,8 @@ Precisely, opening $A$ is a variation on opening $B$ if and only if the move seq
 of $A$ starts (in the prefix meaning) with the move sequence of $B$.
 Similarly, game $A$ has $B$ as an opening if and only if the move sequence of $A$ starts
 with the move sequence of $B$.
+
+\item An user can edit any object they owns.
 \end{itemize}
 
 
@@ -318,11 +322,10 @@ A registered user can then add new games, players, openings and events to the da
 \item Openings may be created from scratch, or as variations on an existing opening.
 \end{itemize}
 
-Users automatically obtain edit rights on any object they created.
+An users owns any object they created, and has edit rights on objects they own.
 Users can modify or delete any object they have edit rights on.
 
 Any registered user can post comments on any object.
-
 
 
 \end{document}
