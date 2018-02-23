@@ -106,7 +106,7 @@ See attributes below [\ref{attr}].
 	\hline
 	\multicolumn{2}{|c|}{\textbf{Object}} \\
 	\hline 
-	id & \em{primary key} \\
+	id & \emph{primary key} \\
 	\hline
 	\end{tabular}
     \end{subtable}
@@ -115,10 +115,11 @@ See attributes below [\ref{attr}].
 	\begin{tabular}[t]{|cr|}
 	\hline
 	\multicolumn{2}{|c|}{\textbf{Game}} \\
+	\multicolumn{2}{|c|}{\emph{inherit} Object} \\
 	\hline 
 	moves    &                  \\
-	date     & \em{optional}    \\
-	location & \em{optional}    \\
+	date     & \emph{optional}    \\
+	location & \emph{optional}    \\
 	result   &                  \\
 	\hline
 	\end{tabular}
@@ -128,11 +129,12 @@ See attributes below [\ref{attr}].
 	\begin{tabular}[t]{|cr|}
 	\hline
 	\multicolumn{2}{|c|}{\textbf{Player}} \\
+	\multicolumn{2}{|c|}{\emph{inherit} Object} \\
 	\hline 
 	first name   &                  \\
 	last name    &                  \\
-	Elo rating   & \em{optional}    \\
-	nationality  & \em{optional}    \\
+	Elo rating   & \emph{optional}    \\
+	nationality  & \emph{optional}    \\
 	\hline
 	\end{tabular}
     \end{subtable}
@@ -141,6 +143,7 @@ See attributes below [\ref{attr}].
 	\begin{tabular}[t]{|cr|}
 	\hline
 	\multicolumn{2}{|c|}{\textbf{Opening}} \\
+	\multicolumn{2}{|c|}{\emph{inherit} Object} \\
 	\hline
 	moves  &                  \\
 	name   &                  \\
@@ -152,11 +155,12 @@ See attributes below [\ref{attr}].
 	\begin{tabular}[t]{|cr|}
 	\hline
 	\multicolumn{2}{|c|}{\textbf{Event}} \\
+	\multicolumn{2}{|c|}{\emph{inherit} Object} \\
 	\hline
 	name     &                  \\
-	location & \em{optional}    \\
-	start    & \em{optional}    \\
-	end      & \em{optional}    \\
+	location & \emph{optional}    \\
+	start    & \emph{optional}    \\
+	end      & \emph{optional}    \\
 	\hline
 	\end{tabular}
     \end{subtable}
@@ -166,8 +170,8 @@ See attributes below [\ref{attr}].
 	\hline
 	\multicolumn{2}{|c|}{\textbf{User}} \\
 	\hline
-	id       & \em{primary key} \\
-	name     & \em{key}         \\
+	id       & \emph{primary key} \\
+	name     & \emph{key}         \\
 	password &                  \\
 	\hline
 	\end{tabular}
@@ -178,7 +182,7 @@ See attributes below [\ref{attr}].
 	\hline
 	\multicolumn{2}{|c|}{\textbf{Comment}} \\
 	\hline
-	id     & \em{primary key} \\
+	id     & \emph{primary key} \\
 	text   &                  \\
 	date   &                  \\
 	\hline
@@ -270,7 +274,7 @@ Criteria are :
 \item A sequence of moves that must match the beginning of the game.
 \item Games using a given opening (used instead of a sequence of moves).
 \item The players names/nationality. This criteria can be set for any side
-(e.g.\ played by R.J.Fischer) or a specific one (e.g.\ black from Russia)
+(e.g.\ one player is R.J.Fischer) or a specific one (e.g.\ black is R.J.Fischer)
 \item Game date (e.g. played after Jan. 20, 2001)
 \item Event
 \item Location
