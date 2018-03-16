@@ -10,6 +10,7 @@
 \usepackage{subcaption}
 \usepackage{enumitem}
 \usepackage{hyperref}
+\usepackage{ulem}
 
 
 
@@ -49,9 +50,9 @@ The translated relational schema is in figure \ref{db}.
     \node[relationship] (gevent) [above left= 1cm and 0cm of game] {in event} edge node [auto] {1} (game);
     \node[entity] (event) [left= 0.5cm of gevent] {Event} edge (gevent);
     
-    \node[relationship] (gopening) [left= 5cm of game] {played in} edge (game);
+    \node[relationship] (gopening) [left= 5cm of game] {\sout{played in}} edge (game);
     \node[entity] (opening) [above= 1cm of gopening] {Opening} edge (gopening);
-    \node[relationship] (variation) [above= 0.5cm of opening] {variation};
+    \node[relationship] (variation) [above= 0.5cm of opening] {\sout{variation}};
     \draw[link] (opening.70) edge (variation.283);
     \draw[link] (opening.110) edge (variation.257);
     
@@ -84,14 +85,14 @@ Bold denotes primary keys, black and white dots denotes required and optional at
 \subsection{Change to EER model}
 A change made to the entity relationship model during translation was the removal of the \verb|played in|
 and \verb|variation| relations. The reason is that those two relationships could be --- 
-as described in integrity constraint --- entirely defined as function of the \verb|moves| attributes 
+as described in previous integrity constraints --- entirely defined as function of the \verb|moves| attributes 
 of entities \verb|Game| and \verb|Opening|, and thus were entirely redundant.
 
 We may re-add those tables during implementation for performance purpose, as search based on them is
 a main part of this database system. The question of whether or not it is actually an interesting
 improvement will however be left for part 3.
 
-Anyways, we did not consider appropriate to include this redundancy in the high-levels models.
+Anyways, we did not consider appropriate to include this redundancy in the high-level model.
 
 \subsection{General translation}
 Most of the translation is straightforward.
