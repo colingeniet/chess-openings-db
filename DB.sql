@@ -9,7 +9,7 @@ CREATE TABLE Object(
   object_id INTEGER UNIQUE NOT NULL,
   owner_id INTEGER NOT NULL,
   PRIMARY KEY (object_id),
-  FOREIGN KEY (owner_id) REFERENCES Account (account_id)
+  FOREIGN KEY (owner_id) REFERENCES Account (account_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE Comment(
@@ -19,15 +19,15 @@ CREATE TABLE Comment(
   text VARCHAR(1000) NOT NULL,
   comment_time DATETIME NOT NULL,
   PRIMARY KEY (comment_id),
-  FOREIGN KEY (account_id) REFERENCES Account (account_id),
-  FOREIGN KEY (object_id) REFERENCES Object (object_id)
+  FOREIGN KEY (account_id) REFERENCES Account (account_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (object_id) REFERENCES Object (object_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE CanEdit(
   account_id INTEGER NOT NULL,
   object_id INTEGER NOT NULL,
-  FOREIGN KEY (account_id) REFERENCES Account (account_id),
-  FOREIGN KEY (object_id) REFERENCES Object (object_id)
+  FOREIGN KEY (account_id) REFERENCES Account (account_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (object_id) REFERENCES Object (object_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
@@ -41,10 +41,10 @@ CREATE TABLE Game(
   event_id INTEGER ,
   result INTEGER NOT NULL,
   PRIMARY KEY (game_id),
-  FOREIGN KEY (game_id) REFERENCES Object (object_id),
-  FOREIGN KEY (white_id) REFERENCES Player (player_id),
-  FOREIGN KEY (black_id) REFERENCES Player (player_id),
-  FOREIGN KEY (event_id) REFERENCES Event (event_id),
+  FOREIGN KEY (game_id) REFERENCES Object (object_id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  FOREIGN KEY (white_id) REFERENCES Player (player_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  FOREIGN KEY (black_id) REFERENCES Player (player_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  FOREIGN KEY (event_id) REFERENCES Event (event_id) ON DELETE SET NULL ON UPDATE CASCADE,
 );
 
 CREATE TABLE Opening(
@@ -52,7 +52,7 @@ CREATE TABLE Opening(
   moves VARBINARY(2000) NOT NULL,
   opening_name VARCHAR(100) NOT NULL,
   PRIMARY KEY (opening_id),
-  FOREIGN KEY (opening_id) REFERENCES Object (object_id)
+  FOREIGN KEY (opening_id) REFERENCES Object (object_id) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
 
 CREATE TABLE Player(
@@ -62,7 +62,7 @@ CREATE TABLE Player(
   elo_rating INTEGER,
   nationality VARCHAR(3),
   PRIMARY KEY (player_id),
-  FOREIGN KEY (player_id) REFERENCES Object (object_id)
+  FOREIGN KEY (player_id) REFERENCES Object (object_id) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
 
 CREATE TABLE Event(
@@ -72,5 +72,5 @@ CREATE TABLE Event(
   start_date DATE,
   end_date DATE,
   PRIMARY KEY (event_id),
-  FOREIGN KEY (event_id) REFERENCES Object (object_id)
+  FOREIGN KEY (event_id) REFERENCES Object (object_id) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
