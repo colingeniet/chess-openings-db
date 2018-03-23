@@ -15,7 +15,7 @@ CREATE TABLE Object(
 CREATE TABLE Comment(
   comment_id INTEGER UNIQUE NOT NULL,
   account_id INTEGER NOT NULL,
-  object_id INTEGER NOT NULL, 
+  object_id INTEGER NOT NULL,
   text VARCHAR(1000) NOT NULL,
   comment_time DATETIME NOT NULL,
   PRIMARY KEY (comment_id),
@@ -36,7 +36,7 @@ CREATE TABLE Game(
   moves VARBINARY(2000) NOT NULL,
   white_id INTEGER,
   black_id INTEGER,
-  start_date DATE, 
+  start_date DATE,
   location VARCHAR(100),
   event_id INTEGER ,
   result INTEGER NOT NULL,
@@ -74,5 +74,3 @@ CREATE TABLE Event(
   PRIMARY KEY (event_id),
   FOREIGN KEY (event_id) REFERENCES Object (object_id)
 );
-
-
