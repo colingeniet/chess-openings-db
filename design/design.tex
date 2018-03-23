@@ -22,7 +22,7 @@
 \tableofcontents
 
 \section{Relational schema}
-As a reminder, the EER schema from the first part is in figure \ref{eer}.
+The EER schema is in figure \ref{eer}.
 The translated relational schema is in figure \ref{db}.
 
 
@@ -118,7 +118,7 @@ being mostly used to enforce the id uniqueness constraint.
 As a general note, \verb|VARCHAR| fields widths are approximate, and will be fine-tuned during implementation.
 
 \subsection{Chess moves representation}
-Our choices for moves representation did not change since part 1.
+Our choices for moves representation did not change since part 1:
 
 Obviously, chess moves will be a very important --- and big --- part of this database.
 Thus, finding an efficient representation for them is important.
@@ -174,7 +174,7 @@ The alternative choice would have been to use a fixed size character field.
 
 
 
-\subsection{Integrity Constraints}
+\section{Integrity Constraints}
 \begin{itemize}
 \item \verb|moves| attributes in relations \verb|Game| and \verb|Opening| must represent
 valid sequences of chess moves starting from the initial chess position.
