@@ -17,7 +17,7 @@ CREATE TABLE Comment(
   account_id INTEGER NOT NULL,
   object_id INTEGER NOT NULL,
   text VARCHAR(1000) NOT NULL,
-  comment_time DATETIME NOT NULL,
+  comment_time TIMESTAMP NOT NULL,
   PRIMARY KEY (comment_id),
   FOREIGN KEY (account_id) REFERENCES Account (account_id) ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (object_id) REFERENCES Object (object_id) ON DELETE CASCADE ON UPDATE CASCADE
@@ -26,34 +26,11 @@ CREATE TABLE Comment(
 CREATE TABLE CanEdit(
   account_id INTEGER NOT NULL,
   object_id INTEGER NOT NULL,
+  PRIMARY KEY (account_id, object_id),
   FOREIGN KEY (account_id) REFERENCES Account (account_id) ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (object_id) REFERENCES Object (object_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-
-CREATE TABLE Game(
-  game_id INTEGER UNIQUE NOT NULL,
-  moves VARBINARY(2000) NOT NULL,
-  white_id INTEGER,
-  black_id INTEGER,
-  start_date DATE,
-  location VARCHAR(100),
-  event_id INTEGER ,
-  result INTEGER NOT NULL,
-  PRIMARY KEY (game_id),
-  FOREIGN KEY (game_id) REFERENCES Object (object_id) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  FOREIGN KEY (white_id) REFERENCES Player (player_id) ON DELETE SET NULL ON UPDATE CASCADE,
-  FOREIGN KEY (black_id) REFERENCES Player (player_id) ON DELETE SET NULL ON UPDATE CASCADE,
-  FOREIGN KEY (event_id) REFERENCES Event (event_id) ON DELETE SET NULL ON UPDATE CASCADE,
-);
-
-CREATE TABLE Opening(
-  opening_id INTEGER UNIQUE NOT NULL,
-  moves VARBINARY(2000) NOT NULL,
-  opening_name VARCHAR(100) NOT NULL,
-  PRIMARY KEY (opening_id),
-  FOREIGN KEY (opening_id) REFERENCES Object (object_id) ON DELETE RESTRICT ON UPDATE RESTRICT
-);
 
 CREATE TABLE Player(
   player_id INTEGER UNIQUE NOT NULL,
@@ -73,4 +50,28 @@ CREATE TABLE Event(
   end_date DATE,
   PRIMARY KEY (event_id),
   FOREIGN KEY (event_id) REFERENCES Object (object_id) ON DELETE RESTRICT ON UPDATE RESTRICT
+);
+
+CREATE TABLE Game(
+  game_id INTEGER UNIQUE NOT NULL,
+  moves BYTEA NOT NULL,
+  white_id INTEGER,
+  black_id INTEGER,
+  start_date DATE,
+  location VARCHAR(100),
+  event_id INTEGER ,
+  result INTEGER NOT NULL,
+  PRIMARY KEY (game_id),
+  FOREIGN KEY (game_id) REFERENCES Object (object_id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  FOREIGN KEY (white_id) REFERENCES Player (player_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  FOREIGN KEY (black_id) REFERENCES Player (player_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  FOREIGN KEY (event_id) REFERENCES Event (event_id) ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+CREATE TABLE Opening(
+  opening_id INTEGER UNIQUE NOT NULL,
+  moves BYTEA NOT NULL,
+  opening_name VARCHAR(100) NOT NULL,
+  PRIMARY KEY (opening_id),
+  FOREIGN KEY (opening_id) REFERENCES Object (object_id) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
