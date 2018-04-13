@@ -1,14 +1,6 @@
 from django.db import models
 
 
-class PSQLByteArray(models.Field):
-    def db_type(self, connection):
-        if connection.settings_dict['ENGINE'] == 'django.db.backends.postgresql':
-            return 'bytea'
-        else:
-            raise NotSupportedError("PSQLByteArray type requires psql backend")
-
-
 class Account(models.Model):
     pseudo = models.CharField(max_length=20, unique=True)
     password = models.CharField(max_length=64)
@@ -59,7 +51,7 @@ class Event(models.Model):
 
 class Game(models.Model):
     object = models.OneToOneField(Object, models.PROTECT, primary_key=True)
-    moves = PSQLByteArray()
+    moves = BinaryField()
     white = models.ForeignKey(
         Player,
         models.SET_NULL,
@@ -101,7 +93,7 @@ class Game(models.Model):
 
 class Opening(models.Model):
     object = models.OneToOneField(Object, models.PROTECT, primary_key=True)
-    moves = PSQLByteArray()
+    moves = BinaryField()
     opening_name = models.CharField(max_length=30)
 
     def __str__(self):
