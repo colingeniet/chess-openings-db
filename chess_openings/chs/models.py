@@ -51,7 +51,7 @@ class Event(models.Model):
 
 class Game(models.Model):
     object = models.OneToOneField(Object, models.PROTECT, primary_key=True)
-    moves = BinaryField()
+    moves = models.BinaryField()
     white = models.ForeignKey(
         Player,
         models.SET_NULL,
@@ -93,7 +93,7 @@ class Game(models.Model):
 
 class Opening(models.Model):
     object = models.OneToOneField(Object, models.PROTECT, primary_key=True)
-    moves = BinaryField()
+    moves = models.BinaryField()
     opening_name = models.CharField(max_length=30)
 
     def __str__(self):
