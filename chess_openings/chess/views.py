@@ -2,5 +2,7 @@ from django.shortcuts import render
 
 from django.http import HttpResponse
 
-def test(request):
-    return HttpResponse("Hello World!")
+from .models import Game
+
+def games(request):
+    return HttpResponse(Game.objects.all())
