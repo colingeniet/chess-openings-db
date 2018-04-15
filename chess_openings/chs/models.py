@@ -31,6 +31,29 @@ class Player(models.Model):
     def __str__(self):
         return self.firstname + " " + self.lastname
 
+    def pgn_str(self):
+        return self.lastname + ", " + self.firstname
+
+
+def find_player(firstname, lastname):
+    return Player.objects.filter(firstname=firstname, lastname=lastname)
+
+
+def find_or_add_player(firstname, lastname, owner):
+    res = find_player(firstname, lastname)
+    if len(res) > 0:
+        return res[0]
+    else:
+        obj=Object(owner=owner)
+        obj.save()
+        player = Player(
+            object=obj,
+            firstname=firstname,
+            lastname=lastname
+        )
+        player.save()
+        return player
+
 
 class Event(models.Model):
     object = models.OneToOneField(Object, models.PROTECT, primary_key=True)
@@ -67,7 +90,7 @@ class Game(models.Model):
     start_date = models.DateField(null=True)
     location = models.CharField(max_length=60, null=True)
     event = models.ForeignKey(Event, models.SET_NULL, null=True)
-    result = models.IntegerField()
+    result = models.CharField(max_length=7)
 
     def __str__(self):
         white_name = str(self.white) if self.white else "unknown"
@@ -75,20 +98,12 @@ class Game(models.Model):
         start_date_str = ", " + self.start_date if self.start_date else ""
         location_str = ", " + self.location if self.location else ""
         players = white_name + " vs " + black_name
-        result_str = " : " + self.result_str()
+        result_str = " : " + self.result
         date_str = ", " + str(self.start_date) if self.start_date else ""
         event_str = ", " + self.event.name() if self.event else ""
         location_str = ", " + self.location if self.location else ""
         context = date_str + event_str + location_str
         return players + result_str + context
-
-    def result_str(self):
-        if self.result > 0:
-            return "1-0"
-        elif self.result < 0:
-            return "0-1"
-        else:
-            return "1/2-1/2"
 
 
 class Opening(models.Model):
