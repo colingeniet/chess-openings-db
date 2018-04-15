@@ -1,16 +1,8 @@
 from django.db import models
 
 
-class PSQLByteArray(models.Field):
-    def db_type(self, connection):
-        if connection.settings_dict['ENGINE'] == 'django.db.backends.postgresql':
-            return 'bytea'
-        else:
-            raise NotSupportedError("PSQLByteArray type requires psql backend")
-
-
 class Account(models.Model):
-    pseudo = models.CharField(max_length=20, unique=True)
+    pseudo = models.CharField(max_length=20, unique=True, db_index=True)
     password = models.CharField(max_length=64)
     can_edit = models.ManyToManyField('Object')
 
@@ -31,18 +23,41 @@ class Comment(models.Model):
 
 class Player(models.Model):
     object = models.OneToOneField(Object, models.PROTECT, primary_key=True)
-    firstname = models.CharField(max_length=30, blank=True)
-    lastname = models.CharField(max_length=30, blank=True)
+    firstname = models.CharField(max_length=50, blank=True, db_index=True)
+    lastname = models.CharField(max_length=50, blank=True, db_index=True)
     elo_rating = models.IntegerField(null=True)
     nationality = models.CharField(max_length=3, null=True)
 
     def __str__(self):
         return self.firstname + " " + self.lastname
 
+    def pgn_str(self):
+        return self.lastname + ", " + self.firstname
+
+
+def find_player(firstname, lastname):
+    return Player.objects.filter(firstname=firstname, lastname=lastname)
+
+
+def find_or_add_player(firstname, lastname, owner):
+    res = find_player(firstname, lastname)
+    if len(res) > 0:
+        return res[0]
+    else:
+        obj=Object(owner=owner)
+        obj.save()
+        player = Player(
+            object=obj,
+            firstname=firstname,
+            lastname=lastname
+        )
+        player.save()
+        return player
+
 
 class Event(models.Model):
     object = models.OneToOneField(Object, models.PROTECT, primary_key=True)
-    event_name = models.CharField(max_length=60)
+    event_name = models.CharField(max_length=60, db_index=True)
     location = models.CharField(max_length=60, null=True)
     start_date = models.DateField(null=True)
     end_date = models.DateField(null=True)
@@ -59,7 +74,7 @@ class Event(models.Model):
 
 class Game(models.Model):
     object = models.OneToOneField(Object, models.PROTECT, primary_key=True)
-    moves = PSQLByteArray()
+    moves = models.BinaryField(db_index=True)
     white = models.ForeignKey(
         Player,
         models.SET_NULL,
@@ -75,7 +90,7 @@ class Game(models.Model):
     start_date = models.DateField(null=True)
     location = models.CharField(max_length=60, null=True)
     event = models.ForeignKey(Event, models.SET_NULL, null=True)
-    result = models.IntegerField()
+    result = models.CharField(max_length=7)
 
     def __str__(self):
         white_name = str(self.white) if self.white else "unknown"
@@ -83,26 +98,18 @@ class Game(models.Model):
         start_date_str = ", " + self.start_date if self.start_date else ""
         location_str = ", " + self.location if self.location else ""
         players = white_name + " vs " + black_name
-        result_str = " : " + self.result_str()
+        result_str = " : " + self.result
         date_str = ", " + str(self.start_date) if self.start_date else ""
         event_str = ", " + self.event.name() if self.event else ""
         location_str = ", " + self.location if self.location else ""
         context = date_str + event_str + location_str
         return players + result_str + context
 
-    def result_str(self):
-        if self.result > 0:
-            return "1-0"
-        elif self.result < 0:
-            return "0-1"
-        else:
-            return "1/2-1/2"
-
 
 class Opening(models.Model):
     object = models.OneToOneField(Object, models.PROTECT, primary_key=True)
-    moves = PSQLByteArray()
-    opening_name = models.CharField(max_length=30)
+    moves = models.BinaryField(db_index=True)
+    opening_name = models.CharField(max_length=50, db_index=True)
 
     def __str__(self):
         return self.opening_name
