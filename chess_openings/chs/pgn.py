@@ -56,9 +56,8 @@ def load_game(game, owner):
 
 
 def load_file(file, owner):
-    pgn = open(file)
     while True:
-        game = chess.pgn.read_game(pgn)
+        game = chess.pgn.read_game(file)
         if not game:
             break
-        load_game(game, account)
+        load_game(game, owner)

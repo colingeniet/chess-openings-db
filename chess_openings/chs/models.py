@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Account(models.Model):
-    pseudo = models.CharField(max_length=20, unique=True)
+    pseudo = models.CharField(max_length=20, unique=True, db_index=True)
     password = models.CharField(max_length=64)
     can_edit = models.ManyToManyField('Object')
 
@@ -23,8 +23,8 @@ class Comment(models.Model):
 
 class Player(models.Model):
     object = models.OneToOneField(Object, models.PROTECT, primary_key=True)
-    firstname = models.CharField(max_length=30, blank=True)
-    lastname = models.CharField(max_length=30, blank=True)
+    firstname = models.CharField(max_length=50, blank=True, db_index=True)
+    lastname = models.CharField(max_length=50, blank=True, db_index=True)
     elo_rating = models.IntegerField(null=True)
     nationality = models.CharField(max_length=3, null=True)
 
@@ -57,7 +57,7 @@ def find_or_add_player(firstname, lastname, owner):
 
 class Event(models.Model):
     object = models.OneToOneField(Object, models.PROTECT, primary_key=True)
-    event_name = models.CharField(max_length=60)
+    event_name = models.CharField(max_length=60, db_index=True)
     location = models.CharField(max_length=60, null=True)
     start_date = models.DateField(null=True)
     end_date = models.DateField(null=True)
@@ -74,7 +74,7 @@ class Event(models.Model):
 
 class Game(models.Model):
     object = models.OneToOneField(Object, models.PROTECT, primary_key=True)
-    moves = models.BinaryField()
+    moves = models.BinaryField(db_index=True)
     white = models.ForeignKey(
         Player,
         models.SET_NULL,
@@ -108,8 +108,8 @@ class Game(models.Model):
 
 class Opening(models.Model):
     object = models.OneToOneField(Object, models.PROTECT, primary_key=True)
-    moves = models.BinaryField()
-    opening_name = models.CharField(max_length=30)
+    moves = models.BinaryField(db_index=True)
+    opening_name = models.CharField(max_length=50, db_index=True)
 
     def __str__(self):
         return self.opening_name
