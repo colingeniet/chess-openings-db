@@ -18,7 +18,7 @@ class Comment(models.Model):
     account = models.ForeignKey(Account, models.CASCADE)
     object = models.ForeignKey(Object, models.CASCADE)
     text = models.CharField(max_length=300)
-    time = models.TimeField()
+    time = models.DateTimeField(auto_now=True)
 
 
 class Player(models.Model):
@@ -70,6 +70,21 @@ class Event(models.Model):
 
     def name(self):
         return self.event_name
+
+
+def find_or_add_event(name, owner):
+    res = Event.objects.filter(event_name=name)
+    if len(res) > 0:
+        return res[0]
+    else:
+        obj=Object(owner=owner)
+        obj.save()
+        event = Event(
+            object=obj,
+            event_name=name
+        )
+        event.save()
+        return event
 
 
 class Game(models.Model):
