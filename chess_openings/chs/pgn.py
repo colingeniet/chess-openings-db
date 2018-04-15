@@ -49,7 +49,10 @@ def load_game(game, owner):
         moves=encode_moves(game),
         white=models.find_or_add_player(white[0], white[1], owner),
         black=models.find_or_add_player(black[0], black[1], owner),
-        result=game.headers["Result"]
+        result=game.headers["Result"],
+        event=models.find_or_add_event(game.headers["Event"], owner),
+        location=game.headers["Site"],
+        start_date=game.headers["Date"].replace('.','-')
     )
     g.save()
     return g
