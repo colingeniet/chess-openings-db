@@ -5,4 +5,4 @@ from django.http import HttpResponse
 from .models import Game
 
 def games(request):
-    return HttpResponse(Game.objects.all())
+    return HttpResponse(Game.objects.first())
