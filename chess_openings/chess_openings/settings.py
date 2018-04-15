@@ -77,11 +77,11 @@ WSGI_APPLICATION = 'chess_openings.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'geniet',
-        'USER': 'geniet',
-        'PASSWORD': 'eeNai4eela',
-        'HOST': 'db.dptinfo.ens-cachan.fr',
-        'PORT': '5432',
+        'NAME': '',
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',
+        'PORT': '',
     }
 }
 
