@@ -16,3 +16,11 @@ class EventDetail(generic.DetailView):
 
 class OpeningDetail(generic.DetailView):
     model = models.Opening
+
+
+class GameList(generic.ListView):
+    model = models.Game
+    context_object_name = 'game_list'
+
+    def get_queryset(self):
+        return models.Game.objects.all()[:50]
