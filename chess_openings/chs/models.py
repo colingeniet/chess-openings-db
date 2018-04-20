@@ -19,7 +19,7 @@ class Comment(models.Model):
     account = models.ForeignKey(Account, models.CASCADE)
     object = models.ForeignKey(Object, models.CASCADE)
     text = models.CharField(max_length=300)
-    time = models.DateTimeField(auto_now=True)
+    time = models.DateTimeField(auto_now=True, db_index=True)
 
 
 class Player(models.Model):
@@ -27,7 +27,7 @@ class Player(models.Model):
     firstname = models.CharField(max_length=50, blank=True, db_index=True)
     lastname = models.CharField(max_length=50, blank=True, db_index=True)
     elo_rating = models.IntegerField(null=True)
-    nationality = models.CharField(max_length=3, null=True)
+    nationality = models.CharField(max_length=3, null=True, db_index=True)
 
     def __str__(self):
         return self.firstname + " " + self.lastname
@@ -62,9 +62,9 @@ def find_or_add_player(firstname, lastname, owner):
 class Event(models.Model):
     object = models.OneToOneField(Object, models.PROTECT, primary_key=True)
     event_name = models.CharField(max_length=60, db_index=True)
-    location = models.CharField(max_length=60, null=True)
-    start_date = models.DateField(null=True)
-    end_date = models.DateField(null=True)
+    location = models.CharField(max_length=60, null=True, db_index=True)
+    start_date = models.DateField(null=True, db_index=True)
+    end_date = models.DateField(null=True, db_index=True)
 
     def __str__(self):
         location_str = ", " + self.location if self.location else ""
@@ -109,8 +109,8 @@ class Game(models.Model):
         related_name="plays_black",
         null=True,
     )
-    start_date = models.DateField(null=True)
-    location = models.CharField(max_length=60, null=True)
+    start_date = models.DateField(null=True, db_index=True)
+    location = models.CharField(max_length=60, null=True, db_index=True)
     event = models.ForeignKey(Event, models.SET_NULL, null=True)
     result = models.CharField(max_length=7)
 
