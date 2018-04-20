@@ -39,19 +39,45 @@ def parse_pgn_name_header(name):
 
 
 def load_game(game, owner):
-    white = parse_pgn_name_header(game.headers["White"])
-    black = parse_pgn_name_header(game.headers["Black"])
+    if game.headers["White"] == "?":
+        white = None
+    else:
+        white_name = parse_pgn_name_header(game.headers["White"])
+        white = models.find_or_add_player(white_name[0], white_name[1], owner)
+
+    if game.headers["Black"] == "?":
+        black = None
+    else:
+        black_name = parse_pgn_name_header(game.headers["Black"])
+        black = models.find_or_add_player(black_name[0], black_name[1], owner)
+
+    if game.headers["Event"] == "?":
+        event = None
+    else:
+        event = models.find_or_add_event(game.headers["Event"], owner)
+
+    if game.headers["Site"] == "?":
+        location = None
+    else:
+        location = game.headers["Site"]
+
+    if "?" in game.headers["Date"]:
+        # just give up if date is not complete
+        date = None
+    else:
+        # PGN uses YYYY.MM.DD, SQL uses YYYY-MM-DD
+        date = game.headers["Date"].replace('.','-')
 
     obj = models.Object(owner=owner)
     obj.save()
     g = models.Game(
         object=obj,
         moves=encode_moves(game),
-        white=models.find_or_add_player(white[0], white[1], owner),
-        black=models.find_or_add_player(black[0], black[1], owner),
+        white=white,
+        black=black,
         result=game.headers["Result"],
-        event=models.find_or_add_event(game.headers["Event"], owner),
-        location=game.headers["Site"],
+        event=event,
+        location=location,
         start_date=game.headers["Date"].replace('.','-')
     )
     g.save()
