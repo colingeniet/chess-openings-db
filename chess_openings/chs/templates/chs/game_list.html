@@ -1,3 +1,8 @@
+{% extends "chs/base.html" %}
+
+{% block title %}games{% endblock %}
+
+{% block content %}
 <table>
   <tr>
     <th>white</th>
@@ -31,3 +36,9 @@
   </tr>
 {% endfor %}
 </table>
+
+<form action="{% url 'chess:game_list' %}" method="get">
+  <input type="number" name="page" value="{{ page|add:"1" }}"/><br/>
+  <input type="submit" value="next"/>
+</form>
+{% endblock %}

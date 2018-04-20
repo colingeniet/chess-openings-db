@@ -1,3 +1,8 @@
+{% extends "chs/base.html" %}
+
+{% block title %}{{game.white}} vs {{game.black}}{% endblock %}
+
+{% block content %}
 <a href="{% url 'chess:player' game.white.object_id %}"> {{game.white}} </a>
 vs
 <a href="{% url 'chess:player' game.black.object_id %}"> {{game.black}} </a>
@@ -12,3 +17,4 @@ vs
 {% if game.start_date %}
 {{game.start_date.strftime}}
 {% endif %}
+{% endblock %}

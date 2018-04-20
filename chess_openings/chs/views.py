@@ -18,9 +18,15 @@ class OpeningDetail(generic.DetailView):
     model = models.Opening
 
 
-class GameList(generic.ListView):
-    model = models.Game
-    context_object_name = 'game_list'
+def game_list(request):
+    try:
+        page = int(request.GET['page'])
+    except KeyError:
+        page = 1
 
-    def get_queryset(self):
-        return models.Game.objects.all()[:50]
+    games = models.Game.objects.all()[(page-1)*50:page*50]
+    context = {
+        'game_list': games,
+        'page': page
+    }
+    return render(request, "chs/game_list.html", context)
