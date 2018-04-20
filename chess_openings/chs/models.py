@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 
 
 class Account(models.Model):
@@ -33,6 +34,9 @@ class Player(models.Model):
 
     def pgn_str(self):
         return self.lastname + ", " + self.firstname
+
+    def games(self):
+        return Game.objects.filter(Q(white=self) | Q(black=self))
 
 
 def find_player(firstname, lastname):
@@ -70,6 +74,9 @@ class Event(models.Model):
 
     def name(self):
         return self.event_name
+
+    def games(self):
+        return Game.objects.filter(event=self)
 
 
 def find_or_add_event(name, owner):
@@ -110,7 +117,7 @@ class Game(models.Model):
     def __str__(self):
         white_name = str(self.white) if self.white else "unknown"
         black_name = str(self.black) if self.black else "unknown"
-        start_date_str = ", " + self.start_date if self.start_date else ""
+        start_date_str = ", " + self.start_date.strftime('%Y.%m.%d') if self.start_date else ""
         location_str = ", " + self.location if self.location else ""
         players = white_name + " vs " + black_name
         result_str = " : " + self.result
