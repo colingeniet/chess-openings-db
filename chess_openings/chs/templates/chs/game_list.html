@@ -1,5 +1,7 @@
 {% extends "chs/base.html" %}
 
+{% load url_replace %}
+
 {% block title %}games{% endblock %}
 
 {% block content %}
@@ -11,6 +13,7 @@
     <th>event</th>
     <th>location</th>
     <th>date</th>
+    <th><!-- detail column --></th>
   </tr>
 {% for game in game_list %}
   <tr>
@@ -37,8 +40,9 @@
 {% endfor %}
 </table>
 
-<form action="{% url 'chess:game_list' %}" method="get">
-  <input type="number" name="page" value="{{ page|add:"1" }}"/><br/>
-  <input type="submit" value="next"/>
-</form>
+<div>
+  {# use django paginator class instead #}
+  <a href="?{% url_replace page=page|add:"-1" %}">prev</a>
+  <a href="?{% url_replace page=page|add:"1" %}">next</a>
+</div>
 {% endblock %}
