@@ -1,8 +1,18 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
+from django.http import HttpResponse, Http404
+from django.views import generic
 
-from django.http import HttpResponse
+from . import models
 
-from .models import Game
 
-def games(request):
-    return HttpResponse(Game.objects.first())
+class GameDetail(generic.DetailView):
+    model = models.Game
+
+class PlayerDetail(generic.DetailView):
+    model = models.Player
+
+class EventDetail(generic.DetailView):
+    model = models.Event
+
+class OpeningDetail(generic.DetailView):
+    model = models.Opening

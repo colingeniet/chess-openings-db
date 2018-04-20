@@ -1,0 +1,14 @@
+<a href="{% url 'chess:player' game.white.object_id %}"> {{game.white}} </a>
+vs
+<a href="{% url 'chess:player' game.black.object_id %}"> {{game.black}} </a>
+: {{game.result}}
+<br/>
+{% if game.event %}
+<a href="{% url 'chess:event' game.event.object_id %}"> {{game.event.event_name}} </a>,
+{% endif %}
+{% if game.location %}
+{{game.location}},
+{% endif %}
+{% if game.start_date %}
+{{game.start_date.strftime}}
+{% endif %}
