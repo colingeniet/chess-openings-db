@@ -1,5 +1,33 @@
-<ul>
+<table>
+  <tr>
+    <th>white</th>
+    <th>black</th>
+    <th>result</th>
+    <th>event</th>
+    <th>location</th>
+    <th>date</th>
+  </tr>
 {% for game in game_list %}
-  <li><a href="{% url 'chess:game' game.object_id %}">{{ game }}</a></li>
+  <tr>
+    {% if game.white %}
+    <td><a href="{% url 'chess:player' game.white.object_id %}">{{game.white}}</a></td>
+    {% else %}
+    <td>unknown</td>
+    {% endif %}
+    {% if game.black %}
+    <td><a href="{% url 'chess:player' game.black.object_id %}">{{game.black}}</a></td>
+    {% else %}
+    <td>unknown</td>
+    {% endif %}
+    <td>{{game.result}}</td>
+    {% if game.event %}
+    <td><a href="{% url 'chess:event' game.event.object_id %}">{{game.event.event_name}}</a></td>
+    {% else %}
+    <td></td>
+    {% endif %}
+    <td>{{game.location}}</td>
+    <td>{{game.start_date}}</td>
+    <td><a href="{% url 'chess:game' game.object_id %}">detail</a></td>
+  </tr>
 {% endfor %}
-</ul>
+</table>
