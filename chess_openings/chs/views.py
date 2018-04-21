@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse, Http404
 from django.views import generic
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from . import models
 
@@ -18,12 +19,21 @@ def pagination_links(current, total):
     right_step = max(1, right_distant_pages // distant_links_per_side)
 
     left = list(range(1, left_adjacent, left_step))
-    middle = list(range(left_adjacent, right_adjacent + 1))
+    middle = list(range(max(1, left_adjacent), min(total, right_adjacent) + 1))
     right = list(range(total, right_adjacent, -right_step))
     right.reverse()
 
     return left + middle + right
 
+
+class PaginatedListView(generic.ListView):
+    def get_context_data(self, **kwargs):
+        context = super(PaginatedListView, self).get_context_data(**kwargs)
+        if context['paginator']:
+            current = context['page_obj'].number
+            total = context['paginator'].num_pages
+            context['page_links'] = pagination_links(current, total)
+        return context
 
 
 class GameDetail(generic.DetailView):
@@ -39,16 +49,6 @@ class OpeningDetail(generic.DetailView):
     model = models.Opening
 
 
-def game_list(request):
-    try:
-        page = int(request.GET['page'])
-    except KeyError:
-        page = 1
-
-    n_results = 50
-    games = models.Game.objects.all()[(page-1)*n_results:page*n_results]
-    context = {
-        'game_list': games,
-        'page': page
-    }
-    return render(request, "chs/game_list.html", context)
+class GameList(PaginatedListView):
+    model = models.Game
+    paginate_by = 50

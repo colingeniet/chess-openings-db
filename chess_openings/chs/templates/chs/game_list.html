@@ -1,10 +1,13 @@
 {% extends "chs/base.html" %}
 
-{% load url_replace %}
-
 {% block title %}games{% endblock %}
 
 {% block content %}
+
+{% with page=game_list %}
+{% include "chs/paginator.html" %}
+{% endwith %}
+
 <table>
   <tr>
     <th>white</th>
@@ -40,9 +43,7 @@
 {% endfor %}
 </table>
 
-<div>
-  {# use django paginator class instead #}
-  <a href="?{% url_replace page=page|add:"-1" %}">prev</a>
-  <a href="?{% url_replace page=page|add:"1" %}">next</a>
-</div>
+{% with page=game_list %}
+{% include "chs/paginator.html" %}
+{% endwith %}
 {% endblock %}
