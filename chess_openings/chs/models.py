@@ -3,6 +3,7 @@ from django.db.models import Q
 
 
 class Account(models.Model):
+    """A website user account."""
     pseudo = models.CharField(max_length=20, unique=True, db_index=True)
     password = models.CharField(max_length=64)
     can_edit = models.ManyToManyField('Object')
@@ -12,10 +13,12 @@ class Account(models.Model):
 
 
 class Object(models.Model):
+    """An object to be displayed in the website."""
     owner = models.ForeignKey(Account, models.CASCADE)
 
 
 class Comment(models.Model):
+    """A comment on an object."""
     account = models.ForeignKey(Account, models.CASCADE)
     object = models.ForeignKey(Object, models.CASCADE)
     text = models.CharField(max_length=300)
@@ -23,6 +26,7 @@ class Comment(models.Model):
 
 
 class Player(models.Model):
+    """A chess player record."""
     object = models.OneToOneField(Object, models.PROTECT, primary_key=True)
     firstname = models.CharField(max_length=50, blank=True, db_index=True)
     lastname = models.CharField(max_length=50, blank=True, db_index=True)
@@ -40,10 +44,12 @@ class Player(models.Model):
 
 
 def find_player(firstname, lastname):
+    """Search a player by name."""
     return Player.objects.filter(firstname=firstname, lastname=lastname)
 
 
 def find_or_add_player(firstname, lastname, owner):
+    """Search a player by name, creates it if not found."""
     res = find_player(firstname, lastname)
     if len(res) > 0:
         return res[0]
@@ -60,6 +66,7 @@ def find_or_add_player(firstname, lastname, owner):
 
 
 class Event(models.Model):
+    """A chess event record."""
     object = models.OneToOneField(Object, models.PROTECT, primary_key=True)
     event_name = models.CharField(max_length=60, db_index=True)
     location = models.CharField(max_length=60, null=True, db_index=True)
@@ -80,6 +87,7 @@ class Event(models.Model):
 
 
 def find_or_add_event(name, owner):
+    """Search an event by name, creates it if not found."""
     res = Event.objects.filter(event_name=name)
     if len(res) > 0:
         return res[0]
@@ -95,6 +103,7 @@ def find_or_add_event(name, owner):
 
 
 class Game(models.Model):
+    """A chess game record."""
     object = models.OneToOneField(Object, models.PROTECT, primary_key=True)
     moves = models.BinaryField(db_index=True)
     white = models.ForeignKey(
@@ -129,6 +138,7 @@ class Game(models.Model):
 
 
 class Opening(models.Model):
+    """A chess opening record."""
     object = models.OneToOneField(Object, models.PROTECT, primary_key=True)
     moves = models.BinaryField(db_index=True)
     opening_name = models.CharField(max_length=50, db_index=True)

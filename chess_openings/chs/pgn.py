@@ -3,6 +3,7 @@ from . import models
 
 
 def encode_move(move):
+    """Encode a chess move into two bytes."""
     if move.promotion:
         byte1 = move.from_square + 64
         byte2 = move.to_square + 64 * (move.promotion - 2)
@@ -14,6 +15,7 @@ def encode_move(move):
 
 
 def decode_move(move):
+    """Decode two bytes representing a chess move."""
     if move[0] > 64:
         return chess.Move(move[0] % 64, move[1] % 64, (move[1] // 64) + 2)
     else:
@@ -21,6 +23,7 @@ def decode_move(move):
 
 
 def encode_moves(game):
+    """Encode a game moves into a bytes sequence."""
     res = bytearray()
     for move in game.main_line():
         res.extend(encode_move(move))
@@ -29,6 +32,7 @@ def encode_moves(game):
 
 
 def parse_pgn_name_header(name):
+    """Split a pgn name header as [firstname, lastname]."""
     if "," in name:
         i = name.index(",")
         lastname = name[:i].strip()
@@ -39,6 +43,7 @@ def parse_pgn_name_header(name):
 
 
 def load_game(game, owner):
+    """Add a chess game to the database."""
     if game.headers["White"] == "?":
         white = None
     else:
@@ -85,6 +90,7 @@ def load_game(game, owner):
 
 
 def load_file(file, owner):
+    """Add games from a pgn file to the database."""
     while True:
         game = chess.pgn.read_game(file)
         if not game:
