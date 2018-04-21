@@ -3,11 +3,7 @@
 {% block title %}games{% endblock %}
 
 {% block content %}
-
-{% with page=game_list %}
 {% include "chs/paginator.html" %}
-{% endwith %}
-
 <table>
   <tr>
     <th>white</th>
@@ -42,8 +38,5 @@
   </tr>
 {% endfor %}
 </table>
-
-{% with page=game_list %}
 {% include "chs/paginator.html" %}
-{% endwith %}
 {% endblock %}

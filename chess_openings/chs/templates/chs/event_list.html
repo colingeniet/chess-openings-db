@@ -1,0 +1,26 @@
+{% extends "chs/base.html" %}
+
+{% block title %}events{% endblock %}
+
+{% block content %}
+{% include "chs/paginator.html" %}
+<table>
+  <tr>
+    <th>event</th>
+    <th>site</th>
+    <th>starts</th>
+    <th>ends</th>
+    <th><!-- detail column --></th>
+  </tr>
+{% for event in event_list %}
+  <tr>
+    <td>{{ event.event_name }}</td>
+    <td>{{ event.location }}</td>
+    <td>{{ event.start_date }}</td>
+    <td>{{ event.end_date }}</td>
+    <td><a href="{% url 'chess:event' event.object_id %}">detail</a></td>
+  </tr>
+{% endfor %}
+</table>
+{% include "chs/paginator.html" %}
+{% endblock %}

@@ -7,6 +7,7 @@ from . import models
 
 
 def pagination_links(current, total):
+    """Creates a list of page numbers to link to."""
     adjacent_links_per_side = 2
     distant_links_per_side = 3
 
@@ -51,4 +52,16 @@ class OpeningDetail(generic.DetailView):
 
 class GameList(PaginatedListView):
     model = models.Game
+    paginate_by = 50
+
+class PlayerList(PaginatedListView):
+    model = models.Player
+    paginate_by = 50
+
+class EventList(PaginatedListView):
+    model = models.Event
+    paginate_by = 50
+
+class OpeningList(PaginatedListView):
+    model = models.Opening
     paginate_by = 50
