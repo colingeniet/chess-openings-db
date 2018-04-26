@@ -51,8 +51,21 @@ class OpeningDetail(generic.DetailView):
 
 
 class GameList(PaginatedListView):
-    model = models.Game
     paginate_by = 50
+    context_object_name = "game_list"
+
+    def get_queryset(self):
+        query = self.request.GET
+        result = models.Game.objects.all()
+        if 'result' in query:
+            result = result.filter(result=query['result'])
+        if 'white' in query:
+            result = result.filter(white__lastname__icontains=query['white'])
+        if 'black' in query:
+            result = result.filter(white__lastname__icontains=query['black'])
+
+        return result
+
 
 class PlayerList(PaginatedListView):
     model = models.Player

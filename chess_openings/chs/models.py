@@ -1,6 +1,10 @@
 from django.db import models
 from django.db.models import Q
 
+from . import pgn
+import chess
+import chess.pgn
+
 
 class Account(models.Model):
     """A website user account."""
@@ -135,6 +139,18 @@ class Game(models.Model):
         location_str = ", " + self.location if self.location else ""
         context = date_str + event_str + location_str
         return players + result_str + context
+
+
+    def moves_pgn(self):
+        binary_moves = [ord(x) for x in self.moves]
+        chess_moves = pgn.decode_moves(binary_moves)
+        game = chess.pgn.Game()
+        node = game
+        res = []
+        for move in chess_moves:
+            node = node.add_main_variation(move)
+            res.append(node.san())
+        return res
 
 
 class Opening(models.Model):

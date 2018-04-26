@@ -30,6 +30,17 @@ def encode_moves(game):
 
     return bytes(res)
 
+def decode_moves(moves):
+    moves_iter = iter(moves)
+    list = []
+    while True:
+        try:
+            move = [next(moves_iter), next(moves_iter)]
+        except StopIteration:
+            return list
+
+        list.append(decode_move(move))
+
 
 def parse_pgn_name_header(name):
     """Split a pgn name header as [firstname, lastname]."""
