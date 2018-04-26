@@ -1,7 +1,4 @@
-from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponse, Http404
 from django.views import generic
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 
 from . import models

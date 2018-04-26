@@ -8,7 +8,8 @@ class ChessStartsWith(Lookup):
         lhs, lhs_params = self.process_lhs(compiler, connection)
         rhs, rhs_params = self.process_rhs(compiler, connection)
         params = lhs_params + rhs_params + rhs_params
-        return "%s BETWEEN %s AND (%s::bytea || E'\\\\xff'::bytea)" % (lhs, rhs, rhs), params
+        sql_code = "%s BETWEEN %s AND (%s::bytea || E'\\\\xff'::bytea)"
+        return sql_code % (lhs, rhs, rhs), params
 
 
 class ChessStartsOf(Lookup):
@@ -18,4 +19,5 @@ class ChessStartsOf(Lookup):
         lhs, lhs_params = self.process_lhs(compiler, connection)
         rhs, rhs_params = self.process_rhs(compiler, connection)
         params = rhs_params + lhs_params + lhs_params
-        return "%s BETWEEN %s AND (%s::bytea || E'\\\\xff'::bytea)" % (rhs, lhs, lhs), params
+        sql_code = "%s BETWEEN %s AND (%s::bytea || E'\\\\xff'::bytea)"
+        return sql_code % (rhs, lhs, lhs), params
