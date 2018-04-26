@@ -31,6 +31,28 @@ def encode_moves(game):
     return bytes(res)
 
 
+def decode_moves(moves):
+    moves_iter = iter(moves)
+    list = []
+    while True:
+        try:
+            move = [next(moves_iter), next(moves_iter)]
+        except StopIteration:
+            return list
+
+        list.append(decode_move(move))
+
+
+def san_moves(moves):
+    game = chess.pgn.Game()
+    node = game
+    res = []
+    for move in moves:
+        node = node.add_main_variation(move)
+        res.append(node.san())
+    return res
+
+
 def parse_pgn_name_header(name):
     """Split a pgn name header as [firstname, lastname]."""
     if "," in name:
@@ -83,7 +105,7 @@ def load_game(game, owner):
         result=game.headers["Result"],
         event=event,
         location=location,
-        start_date=game.headers["Date"].replace('.','-')
+        start_date=date
     )
     g.save()
     return g

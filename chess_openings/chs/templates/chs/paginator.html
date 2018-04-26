@@ -1,15 +1,11 @@
 {% load url_replace %}
 
-<div>
+<div class="paginator">
   {% if page_obj.has_previous %}
   <a href="?{% url_replace page=page_obj.previous_page_number %}">&lt;</a>
   {% endif %}
   {% for p in page_links %}
-  {% if p == page.number %}
-  {{ p }}
-  {% else %}
-  <a href="?{% url_replace page=p %}">{{ p }}</a>
-  {% endif %}
+  <a href="?{% url_replace page=p %}"{% if p == page_obj.number %} class="current_page"{% endif %}>{{ p }}</a>
   {% endfor %}
   {% if page_obj.has_next %}
   <a href="?{% url_replace page=page_obj.next_page_number %}">&gt;</a>

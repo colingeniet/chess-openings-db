@@ -1,0 +1,21 @@
+{% extends "chs/base.html" %}
+
+{% block title %}openings{% endblock %}
+
+{% block content %}
+<script>active_navlink("nav_openings");</script>
+{% include "chs/paginator.html" %}
+<table>
+  <tr>
+    <th>opening</th>
+    <th><!-- detail column --></th>
+  </tr>
+{% for opening in opening_list %}
+  <tr>
+    <td>{{opening.opening_name}}</td>
+    <td><a href="{% url 'chess:opening' opening.object_id %}">detail</a></td>
+  </tr>
+{% endfor %}
+</table>
+{% include "chs/paginator.html" %}
+{% endblock %}
