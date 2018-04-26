@@ -2,7 +2,7 @@
 
 {% load staticfiles %}
 
-{% block title %}{{opening.name}}{% endblock %}
+{% block title %}{{opening.opening_name}}{% endblock %}
 
 {% block head %}
 <script src="{% static "js/jquery-3.3.1.min.js" %}"></script>
@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block content %}
-{{opening.name}}
+{{opening.opening_name}}
 
 <div id="board" style="width: 400px"></div>
 <button type="button" onclick="prev_move(); update()">prev</button>
@@ -73,4 +73,11 @@ function set_moves_text() {
 }
 set_moves_text();
 </script>
+
+<h3>Games</h3>
+<ul>
+{% for game in opening_games %}
+  <li><a href="{% url 'chess:game' game.object_id %}">{{ game }}</a></li>
+{% endfor %}
+</ul>
 {% endblock %}

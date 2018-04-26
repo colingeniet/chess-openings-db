@@ -41,6 +41,11 @@ class PaginatedListView(generic.ListView):
 class GameDetail(generic.DetailView):
     model = models.Game
 
+    def get_context_data(self, **kwargs):
+        context = super(generic.DetailView, self).get_context_data(**kwargs)
+        context['openings'] = context['game'].openings()[:50]
+        return context
+
 
 class PlayerDetail(generic.DetailView):
     model = models.Player
@@ -62,6 +67,11 @@ class EventDetail(generic.DetailView):
 
 class OpeningDetail(generic.DetailView):
     model = models.Opening
+
+    def get_context_data(self, **kwargs):
+        context = super(generic.DetailView, self).get_context_data(**kwargs)
+        context['opening_games'] = context['opening'].games()[:50]
+        return context
 
 
 class GameList(PaginatedListView):

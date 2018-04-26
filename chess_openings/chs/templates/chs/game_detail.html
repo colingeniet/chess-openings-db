@@ -87,4 +87,11 @@ function set_moves_text() {
 }
 set_moves_text();
 </script>
+
+<h3>Openings</h3>
+<ul>
+{% for opening in openings %}
+  <li><a href="{% url 'chess:opening' opening.object_id %}">{{ opening }}</a></li>
+{% endfor %}
+</ul>
 {% endblock %}

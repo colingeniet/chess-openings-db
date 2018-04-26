@@ -1,9 +1,14 @@
 from django.db import models
 from django.db.models import Q
-
 from . import pgn
+from . import lookup
+
 import chess
 import chess.pgn
+
+
+models.BinaryField.register_lookup(lookup.ChessStartsWith)
+models.BinaryField.register_lookup(lookup.ChessStartsOf)
 
 
 class Account(models.Model):
@@ -145,6 +150,9 @@ class Game(models.Model):
         binary_moves = [ord(x) for x in self.moves]
         return pgn.san_moves(pgn.decode_moves(binary_moves))
 
+    def openings(self):
+        return Opening.objects.filter(moves__chs_startof=self.moves)
+
 
 class Opening(models.Model):
     """A chess opening record."""
@@ -158,3 +166,6 @@ class Opening(models.Model):
     def moves_san(self):
         binary_moves = [ord(x) for x in self.moves]
         return pgn.san_moves(pgn.decode_moves(binary_moves))
+
+    def games(self):
+        return Game.objects.filter(moves__chs_startswith=self.moves)
