@@ -34,7 +34,7 @@ vs
 <p id="moves_text"></p>
 <script>
 var moves = [
-  {% for move in game.moves_pgn %}"{{move}}",{% endfor %}
+  {% for move in game.moves_san %}"{{move}}",{% endfor %}
 ];
 var moves_len = moves.length;
 

@@ -141,16 +141,9 @@ class Game(models.Model):
         return players + result_str + context
 
 
-    def moves_pgn(self):
+    def moves_san(self):
         binary_moves = [ord(x) for x in self.moves]
-        chess_moves = pgn.decode_moves(binary_moves)
-        game = chess.pgn.Game()
-        node = game
-        res = []
-        for move in chess_moves:
-            node = node.add_main_variation(move)
-            res.append(node.san())
-        return res
+        return pgn.san_moves(pgn.decode_moves(binary_moves))
 
 
 class Opening(models.Model):
@@ -161,3 +154,7 @@ class Opening(models.Model):
 
     def __str__(self):
         return self.opening_name
+
+    def moves_san(self):
+        binary_moves = [ord(x) for x in self.moves]
+        return pgn.san_moves(pgn.decode_moves(binary_moves))
