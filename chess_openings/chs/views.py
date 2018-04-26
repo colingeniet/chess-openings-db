@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse, Http404
 from django.views import generic
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Q
 
 from . import models
 
@@ -40,11 +41,24 @@ class PaginatedListView(generic.ListView):
 class GameDetail(generic.DetailView):
     model = models.Game
 
+
 class PlayerDetail(generic.DetailView):
     model = models.Player
 
+    def get_context_data(self, **kwargs):
+        context = super(generic.DetailView, self).get_context_data(**kwargs)
+        context['player_games'] = context['player'].games()[:50]
+        return context
+
+
 class EventDetail(generic.DetailView):
     model = models.Event
+
+    def get_context_data(self, **kwargs):
+        context = super(generic.DetailView, self).get_context_data(**kwargs)
+        context['event_games'] = context['event'].games()[:50]
+        return context
+
 
 class OpeningDetail(generic.DetailView):
     model = models.Opening
@@ -62,8 +76,13 @@ class GameList(PaginatedListView):
         if 'white' in query:
             result = result.filter(white__lastname__icontains=query['white'])
         if 'black' in query:
-            result = result.filter(white__lastname__icontains=query['black'])
-
+            result = result.filter(black__lastname__icontains=query['black'])
+        if 'player' in query:
+            result = result.filter(
+                Q(white__lastname__icontains=query['player'])
+                | Q(black__lastname__icontains=query['player']))
+        if 'event' in query:
+            result = result.filter(event__event_name__icontains=query['event'])
         return result
 
 
@@ -71,9 +90,11 @@ class PlayerList(PaginatedListView):
     model = models.Player
     paginate_by = 50
 
+
 class EventList(PaginatedListView):
     model = models.Event
     paginate_by = 50
+
 
 class OpeningList(PaginatedListView):
     model = models.Opening
