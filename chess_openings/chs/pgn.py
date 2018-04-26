@@ -83,7 +83,7 @@ def load_game(game, owner):
         result=game.headers["Result"],
         event=event,
         location=location,
-        start_date=game.headers["Date"].replace('.','-')
+        start_date=date
     )
     g.save()
     return g
