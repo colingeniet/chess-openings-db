@@ -156,7 +156,7 @@ class Opening(models.Model):
     """A chess opening record."""
     object = models.OneToOneField(Object, models.PROTECT, primary_key=True)
     moves = models.BinaryField(db_index=True)
-    opening_name = models.CharField(max_length=50, db_index=True)
+    opening_name = models.CharField(max_length=50, db_index=True, unique=True)
 
     def __str__(self):
         return self.opening_name

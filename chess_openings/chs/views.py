@@ -2,7 +2,8 @@ from django.http import Http404, HttpResponseRedirect
 from django.views import generic
 from django.db.models import Q
 from django.core.urlresolvers import reverse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import render, get_object_or_404
+from . import pgn
 
 from . import models
 
@@ -79,21 +80,53 @@ class GameList(PaginatedListView):
     context_object_name = "game_list"
 
     def get_queryset(self):
+        def is_set(attr):
+            return attr in query and query[attr]
+
         query = self.request.GET
-        result = models.Game.objects.all()
-        if 'result' in query:
+        result = models.Game.objects
+        if is_set('result'):
             result = result.filter(result=query['result'])
-        if 'white' in query:
-            result = result.filter(white__lastname__icontains=query['white'])
-        if 'black' in query:
-            result = result.filter(black__lastname__icontains=query['black'])
-        if 'player' in query:
+        if is_set('location'):
+            result = result.filter(location__icontains=query['location'])
+        if is_set('event'):
+            result = result.filter(event__event_name__icontains=query['event'])
+        if is_set('white'):
+            result = result.filter(
+                Q(white__lastname__icontains=query['white'])
+                | Q(white__firstname__icontains=query['white'])
+            )
+        if is_set('white_nat'):
+            result = result.filter(white__nationality=query['white_nat'])
+        if is_set('black'):
+            result = result.filter(
+                Q(black__lastname__icontains=query['black'])
+                | Q(black__firstname__icontains=query['black'])
+            )
+        if is_set('black_nat'):
+            result = result.filter(white__nationality=query['black_nat'])
+        if is_set('player'):
             result = result.filter(
                 Q(white__lastname__icontains=query['player'])
-                | Q(black__lastname__icontains=query['player']))
-        if 'event' in query:
-            result = result.filter(event__event_name__icontains=query['event'])
-        return result
+                | Q(black__lastname__icontains=query['player'])
+            )
+        if is_set('player_nat'):
+            result = result.filter(
+                Q(white__nationality=query['player_nat'])
+                | Q(black__nationality=query['player_nat'])
+            )
+        if is_set('opening'):
+            try:
+                opening = models.Opening.objects.get(
+                    opening_name=query['opening']
+                )
+                result = result.filter(moves__chs_startswith=opening.moves)
+            except models.Opening.DoesNotExist:
+                result = models.Game.objects.none()
+        if is_set('moves'):
+            moves = pgn.encode_moves_from_uci(query['moves'].split(','))
+            result = result.filter(moves__chs_startswith=moves)
+        return result.all()
 
     def get_context_data(self, **kwargs):
         context = super(GameList, self).get_context_data(**kwargs)
@@ -106,9 +139,14 @@ class GameList(PaginatedListView):
         context['white_wins'] = white
         context['black_wins'] = black
         context['draws'] = draws
-        context['white_percent'] = white / games * 100
-        context['black_percent'] = black / games * 100
-        context['draws_percent'] = draws / games * 100
+        if games == 0:
+            context['white_percent'] = 0
+            context['black_percent'] = 0
+            context['draws_percent'] = 0
+        else:
+            context['white_percent'] = white / games * 100
+            context['black_percent'] = black / games * 100
+            context['draws_percent'] = draws / games * 100
         return context
 
 
@@ -125,6 +163,22 @@ class EventList(PaginatedListView):
 class OpeningList(PaginatedListView):
     model = models.Opening
     paginate_by = 50
+
+
+def search_game(request):
+    return render(request, 'chs/game_search.html')
+
+
+def search_player(request):
+    return render(request, 'chs/player_search.html')
+
+
+def search_event(request):
+    return render(request, 'chs/event_search.html')
+
+
+def search_opening(request):
+    return render(request, 'chs/opening_search.html')
 
 
 def object(request, pk):

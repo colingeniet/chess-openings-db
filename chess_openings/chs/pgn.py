@@ -28,7 +28,6 @@ def encode_moves(game):
     res = bytearray()
     for move in game.main_line():
         res.extend(encode_move(move))
-
     return bytes(res)
 
 
@@ -42,6 +41,13 @@ def decode_moves(moves):
             return list
 
         list.append(decode_move(move))
+
+
+def encode_moves_from_uci(moves):
+    res = bytearray()
+    for move in moves:
+        res.extend(encode_move(chess.Move.from_uci(move)))
+    return bytes(res)
 
 
 def san_moves(moves):
