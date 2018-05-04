@@ -1,0 +1,10 @@
+{% for comment in object.object.comments %}
+<h6>{{comment.account.pseudo}}</h6>
+<p>{{comment.text}}</p>
+{% endfor %}
+
+<form action="{% url 'chess:comment' object.object.id %}" method="post">
+{% csrf_token %}
+  <textarea rows="5" cols="100" maxlength="300" name="comment_text"></textarea><br/>
+  <input type="submit" value="Post comment"/>
+</form>

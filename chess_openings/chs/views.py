@@ -1,5 +1,8 @@
+from django.http import Http404, HttpResponseRedirect
 from django.views import generic
 from django.db.models import Q
+from django.core.urlresolvers import reverse
+from django.shortcuts import get_object_or_404
 
 from . import models
 
@@ -106,3 +109,27 @@ class EventList(PaginatedListView):
 class OpeningList(PaginatedListView):
     model = models.Opening
     paginate_by = 50
+
+
+def object(request, pk):
+    obj = get_object_or_404(models.Object, id=pk)
+    if models.Game.objects.filter(object=obj).exists():
+        return HttpResponseRedirect(reverse('chess:game', args=(obj.id,)))
+    elif models.Player.objects.filter(object=pk).exists():
+        return HttpResponseRedirect(reverse('chess:player', args=(obj.id,)))
+    elif models.Event.objects.filter(object=pk).exists():
+        return HttpResponseRedirect(reverse('chess:event', args=(obj.id,)))
+    elif models.Opening.objects.filter(object=pk).exists():
+        return HttpResponseRedirect(reverse('chess:opening', args=(obj.id,)))
+    else:
+        raise Http404("Requested object does not exists")
+
+
+def comment(request, pk):
+    obj = get_object_or_404(models.Object, id=pk)
+    account = models.Account.objects.first()
+    comment = models.Comment(account=account,
+                             object=obj,
+                             text=request.POST['comment_text'])
+    comment.save()
+    return HttpResponseRedirect(reverse('chess:object', args=(obj.id,)))

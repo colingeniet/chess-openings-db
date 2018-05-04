@@ -22,6 +22,9 @@ class Object(models.Model):
     """An object to be displayed in the website."""
     owner = models.ForeignKey(Account, models.CASCADE)
 
+    def comments(self):
+        return Comment.objects.filter(object=self).order_by('time')
+
 
 class Comment(models.Model):
     """A comment on an object."""

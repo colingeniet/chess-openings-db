@@ -27,4 +27,10 @@ urlpatterns = [
     url(r'^opening/$',
         views.OpeningList.as_view(),
         name='opening_list'),
+    url(r'^(?P<pk>[0-9]+)/$',
+        views.object,
+        name='object'),
+    url(r'^comment/(?P<pk>[0-9]+)/$',
+        views.comment,
+        name="comment"),
 ]
