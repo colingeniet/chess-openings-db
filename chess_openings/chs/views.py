@@ -42,7 +42,7 @@ class GameDetail(generic.DetailView):
     model = models.Game
 
     def get_context_data(self, **kwargs):
-        context = super(generic.DetailView, self).get_context_data(**kwargs)
+        context = super(GameDetail, self).get_context_data(**kwargs)
         context['openings'] = context['game'].openings()[:50]
         return context
 
@@ -51,7 +51,7 @@ class PlayerDetail(generic.DetailView):
     model = models.Player
 
     def get_context_data(self, **kwargs):
-        context = super(generic.DetailView, self).get_context_data(**kwargs)
+        context = super(PlayerDetail, self).get_context_data(**kwargs)
         context['player_games'] = context['player'].games()[:50]
         return context
 
@@ -60,7 +60,7 @@ class EventDetail(generic.DetailView):
     model = models.Event
 
     def get_context_data(self, **kwargs):
-        context = super(generic.DetailView, self).get_context_data(**kwargs)
+        context = super(EventDetail, self).get_context_data(**kwargs)
         context['event_games'] = context['event'].games()[:50]
         return context
 
@@ -69,7 +69,7 @@ class OpeningDetail(generic.DetailView):
     model = models.Opening
 
     def get_context_data(self, **kwargs):
-        context = super(generic.DetailView, self).get_context_data(**kwargs)
+        context = super(OpeningDetail, self).get_context_data(**kwargs)
         context['opening_games'] = context['opening'].games()[:50]
         return context
 
@@ -94,6 +94,22 @@ class GameList(PaginatedListView):
         if 'event' in query:
             result = result.filter(event__event_name__icontains=query['event'])
         return result
+
+    def get_context_data(self, **kwargs):
+        context = super(GameList, self).get_context_data(**kwargs)
+        queryset = self.get_queryset()
+        games = queryset.count()
+        white = queryset.filter(result='1-0').count()
+        black = queryset.filter(result='0-1').count()
+        draws = queryset.filter(result='1/2-1/2').count()
+        context['game_number'] = games
+        context['white_wins'] = white
+        context['black_wins'] = black
+        context['draws'] = draws
+        context['white_percent'] = white / games * 100
+        context['black_percent'] = black / games * 100
+        context['draws_percent'] = draws / games * 100
+        return context
 
 
 class PlayerList(PaginatedListView):

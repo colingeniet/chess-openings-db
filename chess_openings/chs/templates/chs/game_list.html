@@ -4,6 +4,12 @@
 
 {% block content %}
 <script>active_navlink("nav_games");</script>
+<p>
+  games : {{game_number}} </br>
+  white wins : {{white_wins}} ({{white_percent}}%) </br>
+  black wins : {{black_wins}} ({{black_percent}}%) </br>
+  draws : {{draws}} ({{draws_percent}}%) </br>
+</p>
 {% include "chs/paginator.html" %}
 <table>
   <tr>
