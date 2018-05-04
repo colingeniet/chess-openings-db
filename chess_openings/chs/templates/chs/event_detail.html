@@ -10,4 +10,6 @@
 {% endfor %}
 </ul>
 <a href="{% url 'chess:game_list' %}?event={{event.event_name|urlencode}}">all games</a>
+
+{% include "chs/comments.html" %}
 {% endblock %}

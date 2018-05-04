@@ -80,4 +80,6 @@ set_moves_text();
   <li><a href="{% url 'chess:game' game.object_id %}">{{ game }}</a></li>
 {% endfor %}
 </ul>
+
+{% include "chs/comments.html" %}
 {% endblock %}

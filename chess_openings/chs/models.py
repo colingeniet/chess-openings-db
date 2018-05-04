@@ -3,9 +3,6 @@ from django.db.models import Q
 from . import pgn
 from . import lookup
 
-import chess
-import chess.pgn
-
 
 models.BinaryField.register_lookup(lookup.ChessStartsWith)
 models.BinaryField.register_lookup(lookup.ChessStartsOf)
@@ -24,6 +21,9 @@ class Account(models.Model):
 class Object(models.Model):
     """An object to be displayed in the website."""
     owner = models.ForeignKey(Account, models.CASCADE)
+
+    def comments(self):
+        return Comment.objects.filter(object=self).order_by('time')
 
 
 class Comment(models.Model):
@@ -63,7 +63,7 @@ def find_or_add_player(firstname, lastname, owner):
     if len(res) > 0:
         return res[0]
     else:
-        obj=Object(owner=owner)
+        obj = Object(owner=owner)
         obj.save()
         player = Player(
             object=obj,
@@ -85,7 +85,7 @@ class Event(models.Model):
     def __str__(self):
         location_str = ", " + self.location if self.location else ""
         start_date_str = ", " + self.start_date if self.start_date else ""
-        end_date_str = " -- " + self.end_date if self.start_date and self.end_date else ""
+        end_date_str = " -- " + self.end_date if self.end_date else ""
         return self.event_name + location_str + start_date_str + end_date_str
 
     def name(self):
@@ -101,7 +101,7 @@ def find_or_add_event(name, owner):
     if len(res) > 0:
         return res[0]
     else:
-        obj=Object(owner=owner)
+        obj = Object(owner=owner)
         obj.save()
         event = Event(
             object=obj,
@@ -135,7 +135,6 @@ class Game(models.Model):
     def __str__(self):
         white_name = str(self.white) if self.white else "unknown"
         black_name = str(self.black) if self.black else "unknown"
-        start_date_str = ", " + self.start_date.strftime('%Y.%m.%d') if self.start_date else ""
         location_str = ", " + self.location if self.location else ""
         players = white_name + " vs " + black_name
         result_str = " : " + self.result
@@ -144,7 +143,6 @@ class Game(models.Model):
         location_str = ", " + self.location if self.location else ""
         context = date_str + event_str + location_str
         return players + result_str + context
-
 
     def moves_san(self):
         binary_moves = [ord(x) for x in self.moves]
@@ -158,7 +156,7 @@ class Opening(models.Model):
     """A chess opening record."""
     object = models.OneToOneField(Object, models.PROTECT, primary_key=True)
     moves = models.BinaryField(db_index=True)
-    opening_name = models.CharField(max_length=50, db_index=True)
+    opening_name = models.CharField(max_length=50, db_index=True, unique=True)
 
     def __str__(self):
         return self.opening_name

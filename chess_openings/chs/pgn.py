@@ -1,5 +1,6 @@
 import chess.pgn
 from . import models
+from datetime import datetime
 
 
 def encode_move(move):
@@ -27,7 +28,6 @@ def encode_moves(game):
     res = bytearray()
     for move in game.main_line():
         res.extend(encode_move(move))
-
     return bytes(res)
 
 
@@ -41,6 +41,13 @@ def decode_moves(moves):
             return list
 
         list.append(decode_move(move))
+
+
+def encode_moves_from_uci(moves):
+    res = bytearray()
+    for move in moves:
+        res.extend(encode_move(chess.Move.from_uci(move)))
+    return bytes(res)
 
 
 def san_moves(moves):
@@ -59,7 +66,7 @@ def parse_pgn_name_header(name):
         i = name.index(",")
         lastname = name[:i].strip()
         firstname = name[i+1:].strip()
-        return [firstname,lastname]
+        return [firstname, lastname]
     else:
         return ["", name]
 
@@ -92,8 +99,15 @@ def load_game(game, owner):
         # just give up if date is not complete
         date = None
     else:
-        # PGN uses YYYY.MM.DD, SQL uses YYYY-MM-DD
-        date = game.headers["Date"].replace('.','-')
+        # validate date value
+        try:
+            datetime.strptime(game.headers["Date"], "%Y.%m.%d")
+            # PGN uses YYYY.MM.DD, Django uses YYYY-MM-DD
+            date = game.headers["Date"].replace('.', '-')
+        except ValueError:
+            print("Ignoring invalid date in pgn file : "
+                  + game.headers["Date"])
+            date = None
 
     obj = models.Object(owner=owner)
     obj.save()
@@ -107,6 +121,7 @@ def load_game(game, owner):
         location=location,
         start_date=date
     )
+    # Replace invalid date formats with NULL
     g.save()
     return g
 
