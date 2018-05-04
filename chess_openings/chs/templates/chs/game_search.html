@@ -1,0 +1,95 @@
+{% extends "chs/base.html" %}
+
+{% load staticfiles %}
+
+{% block title %}search games{% endblock %}
+
+{% block head %}
+<script src="{% static "js/jquery-3.3.1.min.js" %}"></script>
+<script src="{% static "js/chess.js" %}"></script>
+<script src="{% static "js/chessboard-0.3.0.js" %}"></script>
+<link rel="stylesheet" href="{% static "css/chessboard-0.3.0.css"%}"/>
+{% endblock %}
+
+{% block content %}
+<form action="{% url 'chess:game_list' %}" method="get">
+  <div id="board" style="width: 400px"></div>
+  <p id="moves_text"></p>
+  <input type="hidden" id="moves_input" name="moves"/>
+  <button type="button" onclick="undo()">Undo</button>
+  <button type="button" onclick="reset_board()">Reset</button>
+  <br/>
+  <script>
+  var game = new Chess();
+  var moves_text = document.getElementById("moves_text")
+  var moves_input = document.getElementById("moves_input")
+
+  function onDragStart(source, piece) {
+    if (game.game_over() === true ||
+        (game.turn() === 'w' && piece.search(/^b/) !== -1) ||
+        (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
+      return false;
+    }
+  }
+
+  function onDrop(source, target) {
+    var move = game.move({
+      from: source,
+      to: target,
+      promotion: 'q'
+    });
+
+    if (move === null) return 'snapback';
+    updateStatus();
+  }
+
+  function onSnapEnd() {
+    board.position(game.fen());
+  }
+
+  function updateStatus() {
+    moves_text.innerHTML = game.pgn();
+    moves_input.value = game.history({verbose: true}).map(
+      m => m.from + m.to + (m.promotion ? m.promotion : "")
+    );
+  }
+
+  function undo() {
+    game.undo();
+    board.position(game.fen());
+    updateStatus();
+  }
+
+  function reset_board() {
+    game.reset();
+    board.position(game.fen());
+    updateStatus();
+  }
+
+  var cfg = {
+    draggable: true,
+    position: 'start',
+    onDragStart: onDragStart,
+    onDrop: onDrop,
+    onSnapEnd: onSnapEnd
+  };
+  var board = ChessBoard('board', cfg);
+
+  updateStatus();
+  </script>
+
+  Player <br/>
+  name:<input name="player"/> nationality:<input name="player_nat"/><br/>
+  White <br/>
+  name:<input name="white"/> nationality:<input name="white_nat"/><br/>
+  Black <br/>
+  name:<input name="black"/> nationality:<input name="black_nat"/><br/>
+  Event <br/>
+  <input name="event"/><br/>
+  Site <br/>
+  <input name="location"/><br/>
+  Opening <br/>
+  <input name="opening"/><br/>
+  <input type="submit" value="Search"/>
+</form>
+{% endblock %}
