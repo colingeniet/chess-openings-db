@@ -19,6 +19,9 @@
     background-color: #bbb;
     color: black;
 }
+.nav a.login {
+    float: right;
+}
 
 .paginator {
     display: inline-block;

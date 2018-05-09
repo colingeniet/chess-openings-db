@@ -7,6 +7,8 @@ from . import pgn
 
 from . import models
 
+import hashlib
+
 
 def pagination_links(current, total):
     """Creates a list of page numbers to link to."""
@@ -203,3 +205,44 @@ def comment(request, pk):
                              text=request.POST['comment_text'])
     comment.save()
     return HttpResponseRedirect(reverse('chess:object', args=(obj.id,)))
+
+
+def login(request):
+    return render(request, 'chs/login.html')
+
+
+def handle_login(request):
+    if not request.POST['account']:
+        return render(request, 'chs/login.html', {
+            'error': "missing username"
+        })
+    if not request.POST['password']:
+        return render(request, 'chs/login.html', {
+            'error': "missing password"
+        })
+    try:
+        account = models.Account.objects.get(pseudo=request.POST['account'])
+        digest = hashlib.sha512(request.POST['password'].encode()).digest()
+        if(digest != bytes(account.password)):
+            return render(request, 'chs/login.html', {
+                'error': "incorrect username or password"
+            })
+        request.session['account'] = account.id
+        return HttpResponseRedirect(reverse('chess:mainpage'))
+    except models.Account.DoesNotExist:
+        return render(request, 'chs/login.html', {
+            'error': "incorrect username or password"
+        })
+
+
+def logout(request):
+    try:
+        del request.session['account']
+    except KeyError:
+        pass
+    request.session.flush()
+    return HttpResponseRedirect(reverse('chess:mainpage'))
+
+
+def mainpage(request):
+    return HttpResponseRedirect(reverse('chess:game_list'))

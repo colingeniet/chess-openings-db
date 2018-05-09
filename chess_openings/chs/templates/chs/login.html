@@ -1,0 +1,17 @@
+{% extends "chs/base.html" %}
+
+{% block title %}login{% endblock %}
+
+{% block content %}
+{% if error %}
+<p>Error : {{error}}</p>
+{% endif %}
+<form action="{% url 'chess:handle_login' %}" method="post">
+{% csrf_token %}
+  <label>Username</label><br/>
+  <input type="text" name="account" required="required"/><br/>
+  <label>Password</label><br/>
+  <input type="password" name="password" required="required"/><br/>
+  <input type="submit" value="Login"/>
+</form>
+{% endblock %}
