@@ -1,0 +1,19 @@
+{% extends "chs/base.html" %}
+
+{% block title %}register{% endblock %}
+
+{% block content %}
+{% if error %}
+<p>Error : {{error}}</p>
+{% endif %}
+<form action="{% url 'chess:handle_register' %}" method="post">
+{% csrf_token %}
+  <label>Username</label><br/>
+  <input type="text" name="account" required="required"/><br/>
+  <label>Password</label><br/>
+  <input type="password" name="password" required="required"/><br/>
+  <label>Repeat password</label><br/>
+  <input type="password" name="password2" required="required"/><br/>
+  <input type="submit" value="Create account"/>
+</form>
+{% endblock %}
