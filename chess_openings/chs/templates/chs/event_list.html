@@ -4,6 +4,7 @@
 
 {% block content %}
 <script>active_navlink("nav_events");</script>
+<a href="{% url 'chess:event_search' %}">search</a>
 {% include "chs/paginator.html" %}
 <table>
   <tr>

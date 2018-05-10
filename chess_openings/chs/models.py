@@ -11,7 +11,7 @@ models.BinaryField.register_lookup(lookup.ChessStartsOf)
 class Account(models.Model):
     """A website user account."""
     pseudo = models.CharField(max_length=20, unique=True, db_index=True)
-    password = models.CharField(max_length=64)
+    password = models.BinaryField(max_length=64)
     can_edit = models.ManyToManyField('Object')
 
     def __str__(self):

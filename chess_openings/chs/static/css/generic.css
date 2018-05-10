@@ -3,7 +3,7 @@
     background-color: #444;
     overflow: hidden;
 }
-.nav a {
+.nav a,.nav span {
     float: left;
     color: #fff;
     text-align: center;
@@ -18,6 +18,13 @@
 .nav a.active {
     background-color: #bbb;
     color: black;
+}
+
+.login {
+    float: right;
+}
+.login a,.login span {
+    font-size:12px;
 }
 
 .paginator {

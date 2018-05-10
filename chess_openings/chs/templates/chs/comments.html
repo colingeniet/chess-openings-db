@@ -3,8 +3,12 @@
 <p>{{comment.text}}</p>
 {% endfor %}
 
+{% if request.session.account %}
 <form action="{% url 'chess:comment' object.object.id %}" method="post">
 {% csrf_token %}
   <textarea rows="5" cols="100" maxlength="300" name="comment_text"></textarea><br/>
   <input type="submit" value="Post comment"/>
 </form>
+{% else %}
+<p>You need to be logged in to post comments.</p>
+{% endif %}

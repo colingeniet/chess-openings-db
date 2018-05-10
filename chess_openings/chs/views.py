@@ -7,6 +7,8 @@ from . import pgn
 
 from . import models
 
+import hashlib
+
 
 def pagination_links(current, total):
     """Creates a list of page numbers to link to."""
@@ -197,9 +199,85 @@ def object(request, pk):
 
 def comment(request, pk):
     obj = get_object_or_404(models.Object, id=pk)
-    account = models.Account.objects.first()
+    try:
+        account = models.Account.objects.get(id=request.session['account'])
+    except (KeyError, models.Account.DoesNotExist):
+        return render(request, 'chs/error.html', {
+            'error': "incorrect login informations"
+        })
     comment = models.Comment(account=account,
                              object=obj,
                              text=request.POST['comment_text'])
     comment.save()
     return HttpResponseRedirect(reverse('chess:object', args=(obj.id,)))
+
+
+def login(request):
+    return render(request, 'chs/login.html')
+
+
+def handle_login(request):
+    if not request.POST['account']:
+        return render(request, 'chs/login.html', {
+            'error': "missing username"
+        })
+    if not request.POST['password']:
+        return render(request, 'chs/login.html', {
+            'error': "missing password"
+        })
+    try:
+        account = models.Account.objects.get(pseudo=request.POST['account'])
+        digest = hashlib.sha512(request.POST['password'].encode()).digest()
+        if(digest != bytes(account.password)):
+            return render(request, 'chs/login.html', {
+                'error': "incorrect username or password"
+            })
+        request.session['account'] = account.id
+        return HttpResponseRedirect(reverse('chess:mainpage'))
+    except models.Account.DoesNotExist:
+        return render(request, 'chs/login.html', {
+            'error': "incorrect username or password"
+        })
+
+
+def logout(request):
+    try:
+        del request.session['account']
+    except KeyError:
+        pass
+    request.session.flush()
+    return HttpResponseRedirect(reverse('chess:mainpage'))
+
+
+def register(request):
+    return render(request, 'chs/register.html')
+
+
+def handle_register(request):
+    if not request.POST['account']:
+        return render(request, 'chs/register.html', {
+            'error': "missing username"
+        })
+    if not request.POST['password'] or not request.POST['password2']:
+        return render(request, 'chs/register.html', {
+            'error': "missing password"
+        })
+    if request.POST['password'] != request.POST['password2']:
+        return render(request, 'chs/register.html', {
+            'error': "passwords do not match"
+        })
+    if models.Account.objects.filter(pseudo=request.POST['account']).exists():
+        return render(request, 'chs/register.html', {
+            'error': "username already used"
+        })
+    account = models.Account(
+        pseudo=request.POST['account'],
+        password=hashlib.sha512(request.POST['password'].encode()).digest()
+    )
+    account.save()
+    request.session['account'] = account.id
+    return HttpResponseRedirect(reverse('chess:mainpage'))
+
+
+def mainpage(request):
+    return HttpResponseRedirect(reverse('chess:game_list'))

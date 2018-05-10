@@ -1,0 +1,11 @@
+{% extends "chs/base.html" %}
+
+{% load staticfiles %}
+
+{% block title %}search events{% endblock %}
+
+{% block content %}
+<form action="{% url 'chess:event_list' %}" method="get">
+  <input type="submit" value="Search"/>
+</form>
+{% endblock %}
