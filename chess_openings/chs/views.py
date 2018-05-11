@@ -82,10 +82,11 @@ class GameList(PaginatedListView):
     context_object_name = "game_list"
 
     def get_queryset(self):
+        query = self.request.GET
+
         def is_set(attr):
             return attr in query and query[attr]
 
-        query = self.request.GET
         result = models.Game.objects
         if is_set('result'):
             result = result.filter(result=query['result'])
@@ -181,6 +182,29 @@ def search_event(request):
 
 def search_opening(request):
     return render(request, 'chs/opening_search.html')
+
+
+def create_game(request):
+    return render(request, 'chs/game_create.html')
+
+
+def add_game(request):
+    return HttpResponseRedirect(reverse('chess:game_list'))
+
+
+def add_game_pgn(request):
+    try:
+        account = models.Account.objects.get(id=request.session['account'])
+    except (KeyError, models.Account.DoesNotExist):
+        return render(request, 'chs/error.html', {
+            'error': "incorrect login informations"
+        })
+    if not request.POST['pgn']:
+        return render(request, 'chs/error.html', {
+            'error': "pgn file not found"
+        })
+    pgn.load_string(request.POST['pgn'], account)
+    return HttpResponseRedirect(reverse('chess:game_list'))
 
 
 def object(request, pk):

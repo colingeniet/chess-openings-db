@@ -39,7 +39,7 @@ class Player(models.Model):
     object = models.OneToOneField(Object, models.PROTECT, primary_key=True)
     firstname = models.CharField(max_length=50, blank=True, db_index=True)
     lastname = models.CharField(max_length=50, blank=True, db_index=True)
-    elo_rating = models.IntegerField(null=True)
+    elo_rating = models.IntegerField(null=True, db_index=True)
     nationality = models.CharField(max_length=3, null=True, db_index=True)
 
     def __str__(self):
@@ -130,7 +130,7 @@ class Game(models.Model):
     start_date = models.DateField(null=True, db_index=True)
     location = models.CharField(max_length=60, null=True, db_index=True)
     event = models.ForeignKey(Event, models.SET_NULL, null=True)
-    result = models.CharField(max_length=7)
+    result = models.CharField(max_length=7, db_index=True)
 
     def __str__(self):
         white_name = str(self.white) if self.white else "unknown"
@@ -156,7 +156,7 @@ class Opening(models.Model):
     """A chess opening record."""
     object = models.OneToOneField(Object, models.PROTECT, primary_key=True)
     moves = models.BinaryField(db_index=True)
-    opening_name = models.CharField(max_length=50, db_index=True, unique=True)
+    opening_name = models.CharField(max_length=50, unique=True, db_index=True)
 
     def __str__(self):
         return self.opening_name

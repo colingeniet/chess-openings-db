@@ -5,6 +5,9 @@
 {% block content %}
 <script>active_navlink("nav_games");</script>
 <a href="{% url 'chess:game_search' %}">search</a>
+{% if request.session.account %}
+<a href="{% url 'chess:game_create' %}">create</a>
+{% endif %}
 <p>
   games : {{game_number}} </br>
   white wins : {{white_wins}} ({{white_percent}}%) </br>
