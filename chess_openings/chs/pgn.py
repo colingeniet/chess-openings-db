@@ -1,6 +1,7 @@
 import chess.pgn
 from . import models
 from datetime import datetime
+from io import StringIO
 
 
 def encode_move(move):
@@ -133,3 +134,9 @@ def load_file(file, owner):
         if not game:
             break
         load_game(game, owner)
+
+
+def load_string(str, owner):
+    """Add games from a pgn string to the database."""
+    pgn = StringIO(str)
+    load_file(pgn, owner)
