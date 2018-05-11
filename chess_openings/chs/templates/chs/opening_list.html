@@ -5,6 +5,9 @@
 {% block content %}
 <script>active_navlink("nav_openings");</script>
 <a href="{% url 'chess:opening_search' %}">search</a>
+{% if request.session.account %}
+<a href="{% url 'chess:opening_create' %}">create</a>
+{% endif %}
 {% include "chs/paginator.html" %}
 <table>
   <tr>

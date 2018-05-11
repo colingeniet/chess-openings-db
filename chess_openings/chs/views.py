@@ -188,7 +188,57 @@ def create_game(request):
     return render(request, 'chs/game_create.html')
 
 
+def create_opening(request):
+    return render(request, 'chs/opening_create.html')
+
+
 def add_game(request):
+    try:
+        account = models.Account.objects.get(id=request.session['account'])
+    except (KeyError, models.Account.DoesNotExist):
+        return render(request, 'chs/error.html', {
+            'error': "incorrect login informations"
+        })
+    if not (request.POST['moves'] and request.POST['result']):
+        return render(request, 'chs/error.html', {
+            'error': "missing game information"
+        })
+    moves = pgn.encode_moves_from_uci(request.POST['moves'].split(','))
+    result = request.POST['result']
+    if request.POST['event']:
+        event = models.find_or_add_event(request.POST['event'], account)
+    else:
+        event = None
+    location = request.POST.get('location')
+    date = request.POST.get('date')
+
+    white_fn = request.POST.get('white_first', "")
+    white_ln = request.POST.get('white_last', "")
+    if white_fn != "" or white_ln != "":
+        white = models.find_or_add_player(white_fn, white_ln, account)
+    else:
+        white = None
+
+    black_fn = request.POST.get('black_first', "")
+    black_ln = request.POST.get('black_last', "")
+    if black_fn != "" or black_ln != "":
+        black = models.find_or_add_player(black_fn, black_ln, account)
+    else:
+        black = None
+
+    obj = models.Object(owner=account)
+    obj.save()
+    game = models.Game(
+        object=obj,
+        moves=moves,
+        white=white,
+        black=black,
+        result=result,
+        event=event,
+        location=location,
+        start_date=date
+    )
+    game.save()
     return HttpResponseRedirect(reverse('chess:game_list'))
 
 
@@ -204,6 +254,39 @@ def add_game_pgn(request):
             'error': "pgn file not found"
         })
     pgn.load_string(request.POST['pgn'], account)
+    return HttpResponseRedirect(reverse('chess:game_list'))
+
+
+def add_opening(request):
+    try:
+        account = models.Account.objects.get(id=request.session['account'])
+    except (KeyError, models.Account.DoesNotExist):
+        return render(request, 'chs/error.html', {
+            'error': "incorrect login informations"
+        })
+    if not (request.POST['moves']):
+        return render(request, 'chs/error.html', {
+            'error': "missing game information"
+        })
+    moves = pgn.encode_moves_from_uci(request.POST['moves'].split(','))
+    if not (request.POST['opening_name']):
+        return render(request, 'chs/error.html', {
+            'error': "missing opening name"
+        })
+    name = request.POST['opening_name']
+    if models.Opening.objects.filter(opening_name=name).exists():
+        return render(request, 'chs/error.html', {
+            'error': "opening name already used"
+        })
+
+    obj = models.Object(owner=account)
+    obj.save()
+    opening = models.Opening(
+        object=obj,
+        moves=moves,
+        opening_name=name
+    )
+    opening.save()
     return HttpResponseRedirect(reverse('chess:game_list'))
 
 

@@ -37,6 +37,8 @@ urlpatterns = [
         views.OpeningList.as_view(),
         name='opening_list'),
     url(r'^opening/search/$', views.search_opening, name='opening_search'),
+    url(r'^opening/create/$', views.create_opening, name='opening_create'),
+    url(r'^opening/add/$', views.add_opening, name='opening_add'),
     url(r'^(?P<pk>[0-9]+)/$',
         views.object,
         name='object'),
