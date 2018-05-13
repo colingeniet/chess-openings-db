@@ -96,6 +96,10 @@ class GameList(PaginatedListView):
             result = result.filter(location__icontains=query['location'])
         if is_set('event'):
             result = result.filter(event__event_name__icontains=query['event'])
+        if is_set('after'):
+            result = result.filter(start_date__gte=query['after'])
+        if is_set('before'):
+            result = result.filter(start_date__lte=query['before'])
         if is_set('white'):
             result = result.filter(
                 Q(white__lastname__icontains=query['white'])
@@ -156,18 +160,62 @@ class GameList(PaginatedListView):
 
 
 class PlayerList(PaginatedListView):
-    queryset = models.Player.objects.order_by('lastname')
     paginate_by = 50
+
+    def get_queryset(self):
+        query = self.request.GET
+
+        def is_set(attr):
+            return attr in query and query[attr]
+
+        result = models.Player.objects
+        if is_set('name'):
+            result = result.filter(
+                Q(firstname__icontains=query['name'])
+                | Q(lastname__icontains=query['name']))
+        if is_set('elo_min'):
+            result = result.filter(elo_rating__gte=query['elo_min'])
+        if is_set('elo_max'):
+            result = result.filter(elo_rating__lte=query['elo_max'])
+        if is_set('nationality'):
+            result = result.filter(nationality=query['nationality'])
+        return result.order_by('lastname')
 
 
 class EventList(PaginatedListView):
-    queryset = models.Event.objects.order_by('start_date')
     paginate_by = 50
+
+    def get_queryset(self):
+        query = self.request.GET
+
+        def is_set(attr):
+            return attr in query and query[attr]
+
+        result = models.Event.objects
+        if is_set('name'):
+            result = result.filter(event_name__icontains=query['name'])
+        if is_set('location'):
+            result = result.filter(location__icontains=query['location'])
+        if is_set('after'):
+            result = result.filter(start_date__gte=query['after'])
+        if is_set('before'):
+            result = result.filter(start_date__lte=query['before'])
+        return result.order_by('start_date')
 
 
 class OpeningList(PaginatedListView):
-    queryset = models.Opening.objects.order_by('opening_name')
     paginate_by = 50
+
+    def get_queryset(self):
+        query = self.request.GET
+
+        def is_set(attr):
+            return attr in query and query[attr]
+
+        result = models.Opening.objects
+        if is_set('name'):
+            result = result.filter(opening_name__icontains=query['name'])
+        return result.order_by('opening_name')
 
 
 def search_game(request):
