@@ -6,6 +6,9 @@
 
 {% block content %}
 <form action="{% url 'chess:event_list' %}" method="get">
+  Name:<input name="name"/><br/>
+  Location:<input name="location"/><br/>
+  After:<input type="date" name="after"/> Before:<input type="date" name="before"/><br/>
   <input type="submit" value="Search"/>
 </form>
 {% endblock %}

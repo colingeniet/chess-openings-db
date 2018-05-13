@@ -74,6 +74,8 @@ class OpeningDetail(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super(OpeningDetail, self).get_context_data(**kwargs)
         context['opening_games'] = context['opening'].games()[:50]
+        context['variations'] = context['opening'].variations()[:50]
+        context['variation_of'] = context['opening'].variation_of()[:50]
         return context
 
 
@@ -94,6 +96,10 @@ class GameList(PaginatedListView):
             result = result.filter(location__icontains=query['location'])
         if is_set('event'):
             result = result.filter(event__event_name__icontains=query['event'])
+        if is_set('after'):
+            result = result.filter(start_date__gte=query['after'])
+        if is_set('before'):
+            result = result.filter(start_date__lte=query['before'])
         if is_set('white'):
             result = result.filter(
                 Q(white__lastname__icontains=query['white'])
@@ -129,7 +135,7 @@ class GameList(PaginatedListView):
         if is_set('moves'):
             moves = pgn.encode_moves_from_uci(query['moves'].split(','))
             result = result.filter(moves__chs_startswith=moves)
-        return result.all()
+        return result.order_by('start_date')
 
     def get_context_data(self, **kwargs):
         context = super(GameList, self).get_context_data(**kwargs)
@@ -154,18 +160,62 @@ class GameList(PaginatedListView):
 
 
 class PlayerList(PaginatedListView):
-    model = models.Player
     paginate_by = 50
+
+    def get_queryset(self):
+        query = self.request.GET
+
+        def is_set(attr):
+            return attr in query and query[attr]
+
+        result = models.Player.objects
+        if is_set('name'):
+            result = result.filter(
+                Q(firstname__icontains=query['name'])
+                | Q(lastname__icontains=query['name']))
+        if is_set('elo_min'):
+            result = result.filter(elo_rating__gte=query['elo_min'])
+        if is_set('elo_max'):
+            result = result.filter(elo_rating__lte=query['elo_max'])
+        if is_set('nationality'):
+            result = result.filter(nationality=query['nationality'])
+        return result.order_by('lastname')
 
 
 class EventList(PaginatedListView):
-    model = models.Event
     paginate_by = 50
+
+    def get_queryset(self):
+        query = self.request.GET
+
+        def is_set(attr):
+            return attr in query and query[attr]
+
+        result = models.Event.objects
+        if is_set('name'):
+            result = result.filter(event_name__icontains=query['name'])
+        if is_set('location'):
+            result = result.filter(location__icontains=query['location'])
+        if is_set('after'):
+            result = result.filter(start_date__gte=query['after'])
+        if is_set('before'):
+            result = result.filter(start_date__lte=query['before'])
+        return result.order_by('start_date')
 
 
 class OpeningList(PaginatedListView):
-    model = models.Opening
     paginate_by = 50
+
+    def get_queryset(self):
+        query = self.request.GET
+
+        def is_set(attr):
+            return attr in query and query[attr]
+
+        result = models.Opening.objects
+        if is_set('name'):
+            result = result.filter(opening_name__icontains=query['name'])
+        return result.order_by('opening_name')
 
 
 def search_game(request):
@@ -186,6 +236,14 @@ def search_opening(request):
 
 def create_game(request):
     return render(request, 'chs/game_create.html')
+
+
+def create_player(request):
+    return render(request, 'chs/player_create.html')
+
+
+def create_event(request):
+    return render(request, 'chs/event_create.html')
 
 
 def create_opening(request):
@@ -210,18 +268,22 @@ def add_game(request):
     else:
         event = None
     location = request.POST.get('location')
+    if not location:
+        location = None
     date = request.POST.get('date')
+    if not date:
+        date = None
 
     white_fn = request.POST.get('white_first', "")
     white_ln = request.POST.get('white_last', "")
-    if white_fn != "" or white_ln != "":
+    if white_fn or white_ln:
         white = models.find_or_add_player(white_fn, white_ln, account)
     else:
         white = None
 
     black_fn = request.POST.get('black_first', "")
     black_ln = request.POST.get('black_last', "")
-    if black_fn != "" or black_ln != "":
+    if black_fn or black_ln:
         black = models.find_or_add_player(black_fn, black_ln, account)
     else:
         black = None
@@ -257,6 +319,72 @@ def add_game_pgn(request):
     return HttpResponseRedirect(reverse('chess:game_list'))
 
 
+def add_player(request):
+    try:
+        account = models.Account.objects.get(id=request.session['account'])
+    except (KeyError, models.Account.DoesNotExist):
+        return render(request, 'chs/error.html', {
+            'error': "incorrect login informations"
+        })
+    firstname = request.POST.get('firstname', "")
+    lastname = request.POST.get('lastname', "")
+    elo = request.POST.get('elo')
+    if not elo:
+        elo = None
+    nationality = request.POST.get('nationality')
+    if not nationality:
+        nationality = None
+
+    obj = models.Object(owner=account)
+    obj.save()
+    player = models.Player(
+        object=obj,
+        firstname=firstname,
+        lastname=lastname,
+        elo_rating=elo,
+        nationality=nationality
+    )
+    player.save()
+    return HttpResponseRedirect(reverse('chess:player_list'))
+
+
+def add_event(request):
+    try:
+        account = models.Account.objects.get(id=request.session['account'])
+    except (KeyError, models.Account.DoesNotExist):
+        return render(request, 'chs/error.html', {
+            'error': "incorrect login informations"
+        })
+    name = request.POST['event_name']
+    location = request.POST.get("location")
+    if not location:
+        location = None
+    elo = request.POST.get('elo')
+    if not elo:
+        elo = None
+    nationality = request.POST.get('nationality')
+    if not nationality:
+        nationality = None
+    start_date = request.POST.get('start_date')
+    if not start_date:
+        start_date = None
+    end_date = request.POST.get('end_date')
+    if not end_date:
+        end_date = None
+
+    obj = models.Object(owner=account)
+    obj.save()
+    event = models.Event(
+        object=obj,
+        event_name=name,
+        location=location,
+        start_date=start_date,
+        end_date=end_date
+    )
+    event.save()
+    return HttpResponseRedirect(reverse('chess:event_list'))
+
+
 def add_opening(request):
     try:
         account = models.Account.objects.get(id=request.session['account'])
@@ -287,7 +415,7 @@ def add_opening(request):
         opening_name=name
     )
     opening.save()
-    return HttpResponseRedirect(reverse('chess:game_list'))
+    return HttpResponseRedirect(reverse('chess:opening_list'))
 
 
 def object(request, pk):

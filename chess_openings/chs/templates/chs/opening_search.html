@@ -6,6 +6,9 @@
 
 {% block content %}
 <form action="{% url 'chess:opening_list' %}" method="get">
+  Name:<input name="name"/><br/>
+  Variation of:<input name="variation_of"/><br/>
+  Has variation:<input name="has_variation"/><br/>
   <input type="submit" value="Search"/>
 </form>
 {% endblock %}

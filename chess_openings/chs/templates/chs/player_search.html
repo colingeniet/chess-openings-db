@@ -6,6 +6,9 @@
 
 {% block content %}
 <form action="{% url 'chess:player_list' %}" method="get">
+  Name:<input name="name"/><br/>
+  Elo min:<input type="number" name="elo_min"/> max:<input type="number" name="elo_max"/><br/>
+  Nationality:<input name="nationality"/>
   <input type="submit" value="Search"/>
 </form>
 {% endblock %}
