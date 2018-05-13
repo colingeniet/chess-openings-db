@@ -1,0 +1,19 @@
+{% extends "chs/base.html" %}
+
+{% load staticfiles %}
+
+{% block title %}create player{% endblock %}
+
+{% block content %}
+{% if request.session.account %}
+<form action="{% url 'chess:player_add' %}" method="post">
+  {% csrf_token %}
+  Firstname:<input name="firstname" maxlength="50"/> Lastname:<input name="lastname" maxlength="50"/><br/>
+  Nationality:<input name="nationality" maxlength="3"/><br/>
+  ELO:<input type="number" name="elo"/><br/>
+  <input type="submit" value="Add"/>
+</form>
+{% else %}
+<p>You need to be logged in to create new objects</p>
+{% endif %}
+{% endblock %}

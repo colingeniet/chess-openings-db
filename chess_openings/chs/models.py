@@ -60,8 +60,8 @@ def find_player(firstname, lastname):
 def find_or_add_player(firstname, lastname, owner):
     """Search a player by name, creates it if not found."""
     res = find_player(firstname, lastname)
-    if len(res) > 0:
-        return res[0]
+    if res.exists():
+        return res.first()
     else:
         obj = Object(owner=owner)
         obj.save()
@@ -98,8 +98,8 @@ class Event(models.Model):
 def find_or_add_event(name, owner):
     """Search an event by name, creates it if not found."""
     res = Event.objects.filter(event_name=name)
-    if len(res) > 0:
-        return res[0]
+    if res.exists():
+        return res.first()
     else:
         obj = Object(owner=owner)
         obj.save()
@@ -167,3 +167,13 @@ class Opening(models.Model):
 
     def games(self):
         return Game.objects.filter(moves__chs_startswith=self.moves)
+
+    def variations(self):
+        return Opening.objects.filter(
+                moves__chs_startswith=self.moves
+            ).exclude(object_id=self.object_id)
+
+    def variation_of(self):
+        return Opening.objects.filter(
+                moves__chs_startof=self.moves
+            ).exclude(object_id=self.object_id)
