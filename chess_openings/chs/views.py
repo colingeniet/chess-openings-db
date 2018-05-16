@@ -3,6 +3,7 @@ from django.views import generic
 from django.db.models import Q
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, get_object_or_404
+from django.db.models.sql.constants import INNER, LOUTER
 from . import pgn
 
 from . import models
@@ -79,6 +80,83 @@ class OpeningDetail(generic.DetailView):
         return context
 
 
+# This is a big hack to get django to get django to do a weird join.
+# The problem is with queries like 'games where either player is ...'.
+# Such queries are best done with a single join :
+#   chs_game JOIN chs_player ON
+#   white_id = chs_player.object_id OR black_id = chs_player.object_id
+#
+# Unfortunaly, django is really not designed to do joins with strange
+# conditions, such as join conditions with an OR.
+# Equivalent queries that can easily be expressed through django are
+# heavily inefficient (~10 times slower during my tests).
+
+# This class is a hacked version of `django.db.models.sql.datastructures.Join`
+# which is used has a join descriptor by `django.db.models.sql.query.Query`.
+# It is responsible for producing the SQL code associated with the join,
+# making it easy to change in order to do a custom join condition.
+class PlayerLookupJoin(object):
+    def __init__(self, parent_alias, condition, params):
+        # Join table
+        self.table_name = 'chs_player'
+        self.parent_alias = parent_alias
+        # Note: table_alias is not necessarily known at instantiation time.
+        self.table_alias = None
+        # LOUTER or INNER
+        self.join_type = INNER
+        # Is this join nullabled?
+        self.nullable = False
+        # Custom join condition. Takes the table alias to use as parameters.
+        self.condition = condition
+        # parameters for join condition
+        self.params = params
+
+    def as_sql(self, compiler, connection):
+        qn = compiler.quote_name_unless_alias
+
+        condition = '%s.white_id = %s.object_id OR %s.black_id = %s.object_id'
+        condition = condition % (
+            qn(self.parent_alias),
+            qn(self.table_alias),
+            qn(self.parent_alias),
+            qn(self.table_alias),
+        )
+
+        custom_condition = self.condition(qn(self.table_alias))
+        params = self.params
+
+        on_clause_sql = '(%s) AND (%s)' % (condition, custom_condition)
+
+        alias_str = '' if self.table_alias == self.table_name else (' %s' % self.table_alias)
+        sql = '%s %s%s ON (%s)' % (self.join_type, qn(self.table_name), alias_str, on_clause_sql)
+        return sql, params
+
+    def relabeled_clone(self, change_map):
+        new_parent_alias = change_map.get(self.parent_alias, self.parent_alias)
+        new_table_alias = change_map.get(self.table_alias, self.table_alias)
+        return self.__class__(
+            self.table_name, new_parent_alias, new_table_alias, self.join_type,
+            self.join_field, self.nullable)
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return (
+                self.table_name == other.table_name and
+                self.parent_alias == other.parent_alias
+            )
+        return False
+
+    def demote(self):
+        new = self.relabeled_clone({})
+        new.join_type = INNER
+        return new
+
+    def promote(self):
+        new = self.relabeled_clone({})
+        new.join_type = LOUTER
+        return new
+
+
 class GameList(PaginatedListView):
     paginate_by = 50
     context_object_name = "game_list"
@@ -89,7 +167,7 @@ class GameList(PaginatedListView):
         def is_set(attr):
             return attr in query and query[attr]
 
-        result = models.Game.objects
+        result = models.Game.objects.all()
         if is_set('result'):
             result = result.filter(result=query['result'])
         if is_set('location'):
@@ -114,16 +192,6 @@ class GameList(PaginatedListView):
             )
         if is_set('black_nat'):
             result = result.filter(white__nationality=query['black_nat'])
-        if is_set('player'):
-            result = result.filter(
-                Q(white__lastname__icontains=query['player'])
-                | Q(black__lastname__icontains=query['player'])
-            )
-        if is_set('player_nat'):
-            result = result.filter(
-                Q(white__nationality=query['player_nat'])
-                | Q(black__nationality=query['player_nat'])
-            )
         if is_set('opening'):
             try:
                 opening = models.Opening.objects.get(
@@ -135,6 +203,29 @@ class GameList(PaginatedListView):
         if is_set('moves'):
             moves = pgn.encode_moves_from_uci(query['moves'].split(','))
             result = result.filter(moves__chs_startswith=moves)
+        if is_set('player'):
+            def condition(table):
+                sql = 'UPPER(%s.lastname) = UPPER(%s) OR UPPER(%s.firstname) = UPPER(%s)'
+                return sql % (table, '%s', table, '%s')
+
+            join = PlayerLookupJoin(
+                result.query.get_initial_alias(),
+                condition,
+                [query['player'], query['player']]
+            )
+            result.query.join(join, [])
+        if is_set('player_nat'):
+            def condition(table):
+                sql = '%s.nationality = %s'
+                return sql % (table, '%s')
+
+            join = PlayerLookupJoin(
+                result.query.get_initial_alias(),
+                condition,
+                [query['player_nat']]
+            )
+            result.query.join(join, [])
+        print(result.query)
         return result.order_by('start_date')
 
     def get_context_data(self, **kwargs):
@@ -493,13 +584,9 @@ def handle_register(request):
         return render(request, 'chs/register.html', {
             'error': "missing username"
         })
-    if not request.POST['password'] or not request.POST['password2']:
+    if not request.POST['password']:
         return render(request, 'chs/register.html', {
             'error': "missing password"
-        })
-    if request.POST['password'] != request.POST['password2']:
-        return render(request, 'chs/register.html', {
-            'error': "passwords do not match"
         })
     if models.Account.objects.filter(pseudo=request.POST['account']).exists():
         return render(request, 'chs/register.html', {
