@@ -46,6 +46,7 @@ urlpatterns = [
     url(r'^(?P<pk>[0-9]+)/$',
         views.object,
         name='object'),
+    url(r'^delete/$', views.delete, name='delete'),
     url(r'^comment/(?P<pk>[0-9]+)/$',
         views.comment,
         name="comment"),

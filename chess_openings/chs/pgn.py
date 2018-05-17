@@ -110,8 +110,7 @@ def load_game(game, owner):
                   + game.headers["Date"])
             date = None
 
-    obj = models.Object(owner=owner)
-    obj.save()
+    obj = models.create_obj(owner)
     g = models.Game(
         object=obj,
         moves=encode_moves(game),

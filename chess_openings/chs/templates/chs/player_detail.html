@@ -12,4 +12,7 @@
 <a href="{% url 'chess:game_list' %}?player={{player.lastname|urlencode}}">all games</a>
 
 {% include "chs/comments.html" %}
+{% if can_edit %}
+<span>you can edit this object</span>
+{% endif %}
 {% endblock %}

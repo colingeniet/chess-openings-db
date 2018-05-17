@@ -42,12 +42,18 @@ class PaginatedListView(generic.ListView):
         return context
 
 
+def can_edit(session, object):
+    return ('account' in session and session['account']
+            and models.has_edit_rights(session['account'], object))
+
+
 class GameDetail(generic.DetailView):
     model = models.Game
 
     def get_context_data(self, **kwargs):
         context = super(GameDetail, self).get_context_data(**kwargs)
-        context['openings'] = context['game'].openings()[:50]
+        context['openings'] = context['game'].openings()
+        context['can_edit'] = can_edit(self.request.session, context['game'])
         return context
 
 
@@ -57,6 +63,7 @@ class PlayerDetail(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super(PlayerDetail, self).get_context_data(**kwargs)
         context['player_games'] = context['player'].games()[:50]
+        context['can_edit'] = can_edit(self.request.session, context['player'])
         return context
 
 
@@ -66,6 +73,7 @@ class EventDetail(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super(EventDetail, self).get_context_data(**kwargs)
         context['event_games'] = context['event'].games()[:50]
+        context['can_edit'] = can_edit(self.request.session, context['event'])
         return context
 
 
@@ -74,9 +82,11 @@ class OpeningDetail(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(OpeningDetail, self).get_context_data(**kwargs)
-        context['opening_games'] = context['opening'].games()[:50]
-        context['variations'] = context['opening'].variations()[:50]
-        context['variation_of'] = context['opening'].variation_of()[:50]
+        opening = context['opening']
+        context['opening_games'] = opening.games()[:50]
+        context['variations'] = opening.variations()
+        context['variation_of'] = opening.variation_of()
+        context['can_edit'] = can_edit(self.request.session, opening)
         return context
 
 
@@ -225,7 +235,6 @@ class GameList(PaginatedListView):
                 [query['player_nat']]
             )
             result.query.join(join, [])
-        print(result.query)
         return result.order_by('start_date')
 
     def get_context_data(self, **kwargs):
@@ -379,8 +388,7 @@ def add_game(request):
     else:
         black = None
 
-    obj = models.Object(owner=account)
-    obj.save()
+    obj = models.create_obj(account)
     game = models.Game(
         object=obj,
         moves=moves,
@@ -426,8 +434,7 @@ def add_player(request):
     if not nationality:
         nationality = None
 
-    obj = models.Object(owner=account)
-    obj.save()
+    obj = models.create_obj(account)
     player = models.Player(
         object=obj,
         firstname=firstname,
@@ -463,8 +470,7 @@ def add_event(request):
     if not end_date:
         end_date = None
 
-    obj = models.Object(owner=account)
-    obj.save()
+    obj = models.create_obj(account)
     event = models.Event(
         object=obj,
         event_name=name,
@@ -498,8 +504,7 @@ def add_opening(request):
             'error': "opening name already used"
         })
 
-    obj = models.Object(owner=account)
-    obj.save()
+    obj = models.create_obj(account)
     opening = models.Opening(
         object=obj,
         moves=moves,
@@ -507,6 +512,10 @@ def add_opening(request):
     )
     opening.save()
     return HttpResponseRedirect(reverse('chess:opening_list'))
+
+
+def delete(request):
+    pass
 
 
 def object(request, pk):

@@ -12,10 +12,20 @@ class Account(models.Model):
     """A website user account."""
     pseudo = models.CharField(max_length=20, unique=True, db_index=True)
     password = models.BinaryField(max_length=64)
+    admin = models.BooleanField(default=False, db_index=True)
     can_edit = models.ManyToManyField('Object')
 
     def __str__(self):
         return self.pseudo
+
+    def has_edit_rights(self, obj):
+        id = obj.object_id
+        obj = Object.objects.get(pk=id)
+        return self.admin or obj.owner == self or self.can_edit.filter(id=id).exists()
+
+
+def has_edit_rights(account_pk, obj):
+    return Account.objects.get(pk=account_pk).has_edit_rights(obj)
 
 
 class Object(models.Model):
@@ -24,6 +34,13 @@ class Object(models.Model):
 
     def comments(self):
         return Comment.objects.filter(object=self).order_by('time')
+
+
+def create_obj(account):
+    obj = Object(owner=account)
+    obj.save()
+    account.can_edit.add(obj)
+    return obj
 
 
 class Comment(models.Model):
