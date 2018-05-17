@@ -27,5 +27,8 @@ function validate_form() {
   <label>Repeat password</label><br/>
   <input type="password" name="password2" required="required"/><br/>
   <input type="submit" value="Create account"/>
+  {% if request.GET.next %}
+  <input type="hidden" name="next" value="{{request.GET.next}}"/>
+  {% endif %}
 </form>
 {% endblock %}

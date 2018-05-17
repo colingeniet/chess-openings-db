@@ -13,6 +13,7 @@
 
 {% include "chs/comments.html" %}
 {% if can_edit %}
-<span>you can edit this object</span>
+<a href="{% url 'chess:player_edit' player.object_id %}">edit</a>
+<a href="{% url 'chess:player_delete' player.object_id %}">delete</a>
 {% endif %}
 {% endblock %}

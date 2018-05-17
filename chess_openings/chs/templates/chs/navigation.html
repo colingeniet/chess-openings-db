@@ -1,10 +1,10 @@
 <div class="login">
   {% if request.session.account %}
   <span>{{request.session.account.pseudo}}</span>
-  <a href="{% url 'chess:logout' %}">logout</a>
+  <a href="{% url 'chess:logout' %}?next={% firstof request.path '/' %}">logout</a>
   {% else %}
-  <a href="{% url 'chess:login' %}">login</a>
-  <a href="{% url 'chess:register' %}">create account</a>
+  <a href="{% url 'chess:login' %}?next={% firstof request.path '/' %}">login</a>
+  <a href="{% url 'chess:register' %}?next={% firstof request.path '/' %}">create account</a>
   {% endif %}
 </div>
 <br/>

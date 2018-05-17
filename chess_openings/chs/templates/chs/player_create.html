@@ -8,10 +8,14 @@
 {% if request.session.account %}
 <form action="{% url 'chess:player_add' %}" method="post">
   {% csrf_token %}
-  Firstname:<input name="firstname" maxlength="50"/> Lastname:<input name="lastname" maxlength="50"/><br/>
-  Nationality:<input name="nationality" maxlength="3"/><br/>
-  ELO:<input type="number" name="elo"/><br/>
-  <input type="submit" value="Add"/>
+  {% if player %}
+  <input type="hidden" name="id" value="{{player.object_id}}"/>
+  {% endif %}
+  Firstname:<input name="firstname" maxlength="50" {% if player.firstname %}value="{{player.firstname}}"{% endif %}/>
+  Lastname:<input name="lastname" maxlength="50" {% if player.lastname %}value="{{player.lastname}}"{% endif %}/><br/>
+  Nationality:<input name="nationality" maxlength="3" {% if player.nationality %}value="{{player.nationality}}"{% endif %}/><br/>
+  ELO:<input type="number" name="elo" {% if player.elo_rating %}value="{{player.elo_rating}}"{% endif %}/><br/>
+  <input type="submit" value="{% if player %}Modify{% else %}Add{% endif %}"/>
 </form>
 {% else %}
 <p>You need to be logged in to create new objects</p>
