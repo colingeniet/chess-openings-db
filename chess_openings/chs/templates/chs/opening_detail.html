@@ -69,9 +69,11 @@ function move_text(i) {
 function set_moves_text() {
   text = "";
   for (i=0; i<moves_len; i++) {
-    str = move_text(i) + " ";
+    prefix = "";
+    if(!(i%2)) prefix = (i/2 + 1) + ". "
+    str = move_text(i);
     if ((i+1) === current_move) str = str.bold();
-    text += str;
+    text += prefix + str + " ";
   }
   document.getElementById("moves_text").innerHTML = text;
 }
