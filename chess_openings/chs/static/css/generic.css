@@ -142,7 +142,8 @@ textarea {
 }
 
 .move-menu li.reset {
-    margin-left: 75px;
+    display: flex;
+    justify-content: center;
 }
 
 form {
