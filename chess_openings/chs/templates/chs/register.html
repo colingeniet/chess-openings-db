@@ -3,6 +3,8 @@
 {% block title %}register{% endblock %}
 
 {% block content %}
+<nav> </nav>
+<section>
 {% if error %}
 <p>Error : {{error}}</p>
 {% endif %}
@@ -16,4 +18,5 @@
   <input type="password" name="password2" required="required"/><br/>
   <input type="submit" value="Create account"/>
 </form>
+</section>
 {% endblock %}
