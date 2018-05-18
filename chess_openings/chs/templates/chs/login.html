@@ -9,15 +9,17 @@
 <p>Error : {{error}}</p>
 {% endif %}
 <form action="{% url 'chess:handle_login' %}" method="post">
+  <fieldset> <legend>Login</legend>
 {% csrf_token %}
-  <label>Username</label><br/>
+  <label for="account">Username</label>
   <input type="text" name="account" required="required"/><br/>
-  <label>Password</label><br/>
+  <label for="password">Password</label>
   <input type="password" name="password" required="required"/><br/>
   <input type="submit" value="Login"/>
   {% if request.GET.next %}
   <input type="hidden" name="next" value="{{request.GET.next}}"/>
   {% endif %}
+  </fieldset>
 </form>
 </section>
 {% endblock %}
