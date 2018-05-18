@@ -128,22 +128,13 @@ textarea {
     padding:0 15px;
 }
 
-.move-menu li.prev .ico-after {
-    padding-left:30px;
-}
-
 .move-menu li.next {
     margin-left: auto;
     margin-right: 6px;
 }
 
-.move-menu li.next .ico-after {
-    padding-right:30px;
-}
-
 .move-menu li.reset {
-    display: flex;
-    justify-content: center;
+    margin-left: 75px;
 }
 
 form {
