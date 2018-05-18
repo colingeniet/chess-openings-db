@@ -3,6 +3,9 @@
 {% block title %}{{player}}{% endblock %}
 
 {% block content %}
+<nav> </nav>
+
+<section>
 {{player}}
 <ul>
 {% for game in player_games %}
@@ -12,4 +15,5 @@
 <a href="{% url 'chess:game_list' %}?player={{player.lastname|urlencode}}">all games</a>
 
 {% include "chs/comments.html" %}
+</section>
 {% endblock %}
