@@ -5,31 +5,30 @@
 {% block title %}{{game.white}} vs {{game.black}}{% endblock %}
 
 {% block head %}
-<script src="{% static "js/jquery-3.3.1.min.js" %}"></script>
-<script src="{% static "js/chess.js" %}"></script>
-<script src="{% static "js/chessboard-0.3.0.js" %}"></script>
-<link rel="stylesheet" href="{% static "css/chessboard-0.3.0.css"%}"/>
+  <script src="{% static "js/jquery-3.3.1.min.js" %}"></script>
+  <script src="{% static "js/chess.js" %}"></script>
+  <script src="{% static "js/chessboard-0.3.0.js" %}"></script>
+  <link rel="stylesheet" href="{% static "css/chessboard-0.3.0.css"%}"/>
 {% endblock %}
 
 {% block content %}
 <nav></nav>
 
 <section>
-  <h2>
+  <h1>
     {% if game.white %}
-    <a href="{% url 'chess:player' game.white.object_id %}"> {{game.white}} </a>
+      <a href="{% url 'chess:player' game.white.object_id %}"> {{game.white}} </a>
     {% else %}
-    unknown
+      unknown
     {% endif %}
     vs
     {% if game.black %}
-    <a href="{% url 'chess:player' game.black.object_id %}"> {{game.black}} </a>
+      <a href="{% url 'chess:player' game.black.object_id %}"> {{game.black}} </a>
     {% else %}
-    unknown
+      unknown
     {% endif %}
     : {{game.result}}
-  </h2>
-  <br/>
+  </h1>
   {% if game.event %}
     <a href="{% url 'chess:event' game.event.object_id %}"> {{game.event.event_name}} </a>,
   {% endif %}
