@@ -84,7 +84,6 @@ section {
 }
 
 h1 {
-    /*text-shadow: 3px 3px 3px red;*/
     text-align: center;
 }
 
@@ -100,7 +99,7 @@ textarea {
     border-top:1px solid #d2d5d6;
     border-bottom:1px solid #d2d5d6;
     background:#fbfbfb;
-    margin-bottom:20px!important;
+    margin-bottom:20px;
     display:-webkit-box;
     display:-ms-flexbox;
     display:flex;
@@ -162,7 +161,6 @@ input, textarea, select {
     border:1px solid #F5C5C5;
     border-radius:5px;
     font-size: 1.7vmin;
-    /*box-shadow:1px 1px 2px #C0C0C0 inset; */
 }
 
 select {

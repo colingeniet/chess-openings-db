@@ -1,26 +1,17 @@
 {% load get_account %}
 
 <header>
-  <script>
-  function active_navlink(class_name) {
-    elts = document.getElementsByClassName(class_name)
-    for (i=0; i<elts.length; i++) {
-      elts[i].className += " active";
-    }
-  }
-  </script>
-
   <div class="header-elt">
-   <a href="{% url 'chess:game_list'%}" class="nav_games"><h3> games </h3></a>
+   <a href="{% url 'chess:game_list'%}"><h3> games </h3></a>
   </div>
   <div class="header-elt">
-    <a href="{% url 'chess:player_list'%}" class="nav_players"><h3>players</h3></a>
+    <a href="{% url 'chess:player_list'%}"><h3>players</h3></a>
   </div>
   <div class="header-elt">
-    <a href="{% url 'chess:event_list'%}" class="nav_events"><h3>events</h3></a>
+    <a href="{% url 'chess:event_list'%}"><h3>events</h3></a>
   </div>
   <div class="header-elt">
-    <a href="{% url 'chess:opening_list'%}" class="nav_openings"><h3>openings</h3></a>
+    <a href="{% url 'chess:opening_list'%}"><h3>openings</h3></a>
   </div>
 
   <div class="header-login">

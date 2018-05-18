@@ -4,7 +4,6 @@
 
 {% block content %}
 <h1>Games list</h1>
-<script>active_navlink("nav_games");</script>
 You can <a href="{% url 'chess:game_search' %}">search</a>
 {% if request.session.account %}
   or <a href="{% url 'chess:game_create' %}">create</a>
