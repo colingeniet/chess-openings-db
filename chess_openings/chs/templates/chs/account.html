@@ -1,0 +1,41 @@
+{% extends "chs/base.html" %}
+
+{% block title %}account settings{% endblock %}
+
+{% block content %}
+<nav> </nav>
+<section>
+  <h1>Account Settings</h1>
+  {% if error %}
+  <p>Error : {{error}}</p>
+  {% endif %}
+  <script>
+  function validate_form() {
+    var form = document.forms["password_form"];
+    if(form["password"].value !== form["password2"].value) {
+      alert("Passwords do not match");
+      return false;
+    } else {
+      form["password2"].disable = true;
+      return true;
+    }
+  }
+  </script>
+  {% if request.session.account %}
+  <form id="password_form" action="{% url 'chess:change_password' %}" method="post" onsubmit="return validate_form()">
+    <fieldset> <legend>Change password</legend>
+    {% csrf_token %}
+    <label>Old password:</label>
+    <input type="password" name="old_password" required="required"/><br/>
+    <label>New password:</label>
+    <input type="password" name="password" required="required"/><br/>
+    <label>Repeat new password:</label>
+    <input type="password" name="password2" required="required"/><br/>
+    <input type="submit" value="Change password" style="width: 150px"/>
+    </fieldset>
+  </form>
+  {% else %}
+  <p>You are not logged in !</p>
+  {% endif %}
+</section>
+{% endblock %}

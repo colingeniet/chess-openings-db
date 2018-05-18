@@ -72,4 +72,10 @@ urlpatterns = [
     url(r'^register/handle/$',
         views.handle_register,
         name="handle_register"),
+    url(r'^account/$',
+        views.account,
+        name="account"),
+    url(r'^account/change_password$',
+        views.change_password,
+        name="change_password")
 ]

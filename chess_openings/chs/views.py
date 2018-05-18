@@ -744,5 +744,47 @@ def handle_register(request):
     return HttpResponseRedirect(path)
 
 
+def account(request):
+    if 'account' in request.session:
+        return render(request, "chs/account.html")
+    else:
+        return render(request, 'chs/error.html', {
+            'error': "You are not logged in"
+        })
+
+
+def change_password(request):
+    if not request.session['account']:
+        return render(request, 'chs/error.html', {
+            'error': "You are not logged in"
+        })
+    try:
+        account = models.Account.objects.get(id=request.session['account'])
+    except models.Account.DoesNotExist:
+        return render(request, 'chs/error.html', {
+            'error': "incorrect account informations"
+        })
+
+    if not request.POST['old_password'] or not request.POST['password']:
+        return render(request, 'chs/account.html', {
+            'error': "missing password"
+        })
+
+    passwd = bytes(request.POST['old_password'].encode())
+    salt = account.salt
+    digest = hashlib.pbkdf2_hmac('sha256', passwd, salt, 100000)
+    if(digest != bytes(account.password)):
+        return render(request, 'chs/account.html', {
+            'error': "incorrect password"
+        })
+
+    passwd = bytes(request.POST['password'].encode())
+    salt = os.urandom(64)
+    account.password = hashlib.pbkdf2_hmac('sha256', passwd, salt, 100000)
+    account.salt = salt
+    account.save()
+    return HttpResponseRedirect(reverse('chess:account'))
+
+
 def mainpage(request):
     return HttpResponseRedirect(reverse('chess:game_list'))

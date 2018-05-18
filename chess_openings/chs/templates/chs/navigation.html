@@ -26,7 +26,7 @@
   <div id="header-login">
   {% if request.session.account %}
     <div id="header-elt">
-      <a href ="#"><h3>{{ request.session.account|get_account }}</h3></a>
+      <a href ="{% url 'chess:account' %}"><h3>{{ request.session.account|get_account }}</h3></a>
     </div>
     <div id="header-elt">
       <a href="{% url 'chess:logout' %}?next={% firstof request.path '/' %}"><h3>logout</h3></a>
