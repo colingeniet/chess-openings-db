@@ -173,7 +173,7 @@ input, textarea, select {
     /*box-shadow:1px 1px 2px #C0C0C0 inset; */
 }
 
-select {    
+select {
     height: 30px;
 }
 
@@ -232,4 +232,3 @@ input[type="submit"]:hover {
 .paginator a:hover:not(.current_page) {
     background-color: #ccc;
 }
-
