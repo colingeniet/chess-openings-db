@@ -6,28 +6,30 @@
 <nav> </nav>
 
 <section>
-<script>active_navlink("nav_players");</script>
-<a href="{% url 'chess:player_search' %}">search</a>
-{% if request.session.account %}
-<a href="{% url 'chess:player_create' %}">create</a>
-{% endif %}
-{% include "chs/paginator.html" %}
-<table>
-  <tr>
-    <th>name</th>
-    <th>nationality</th>
-    <th>ELO</th>
-    <th><!-- detail column --></th>
-  </tr>
-{% for player in player_list %}
-  <tr>
-    <td>{{ player.firstname }} {{ player.lastname }}</td>
-    <td>{{ player.nationality }}</td>
-    <td>{{ player.elo_rating }}</td>
-    <td><a href="{% url 'chess:player' player.object_id %}">detail</a></td>
-  </tr>
-{% endfor %}
-</table>
-{% include "chs/paginator.html" %}
+  <h1>Player list</h1>
+  <script>active_navlink("nav_players");</script>
+  You can <a href="{% url 'chess:player_search' %}">search</a>
+  {% if request.session.account %}
+    or <a href="{% url 'chess:player_create' %}">create</a>
+  {% endif %}
+  players.
+  {% include "chs/paginator.html" %}
+  <table>
+    <tr>
+      <th>name</th>
+      <th>nationality</th>
+      <th>ELO</th>
+      <th><!-- detail column --></th>
+    </tr>
+  {% for player in player_list %}
+    <tr>
+      <td>{{ player.firstname }} {{ player.lastname }}</td>
+      <td>{{ player.nationality }}</td>
+      <td>{{ player.elo_rating }}</td>
+      <td><a href="{% url 'chess:player' player.object_id %}">detail</a></td>
+    </tr>
+  {% endfor %}
+  </table>
+  {% include "chs/paginator.html" %}
 </section>
 {% endblock %}
