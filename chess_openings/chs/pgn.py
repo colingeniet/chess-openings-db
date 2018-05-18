@@ -77,19 +77,55 @@ def load_game(game, owner):
     if game.headers["White"] == "?":
         white = None
     else:
+        try:
+            white_elo = int(game.headers["WhiteElo"])
+        except (ValueError, KeyError):
+            white_elo = None
         white_name = parse_pgn_name_header(game.headers["White"])
-        white = models.find_or_add_player(white_name[0], white_name[1], owner)
+        white = models.find_or_add_player(
+            white_name[0],
+            white_name[1],
+            owner,
+            elo_rating=white_elo
+        )
 
     if game.headers["Black"] == "?":
         black = None
     else:
+        try:
+            black_elo = int(game.headers["BlackElo"])
+        except (ValueError, KeyError):
+            black_elo = None
         black_name = parse_pgn_name_header(game.headers["Black"])
-        black = models.find_or_add_player(black_name[0], black_name[1], owner)
+        black = models.find_or_add_player(
+            black_name[0],
+            black_name[1],
+            owner,
+            elo_rating=black_elo
+        )
 
     if game.headers["Event"] == "?":
         event = None
     else:
-        event = models.find_or_add_event(game.headers["Event"], owner)
+        if "EventDate" in game.headers and "?" not in game.headers["EventDate"]:
+            # validate date value
+            try:
+                datetime.strptime(game.headers["EventDate"], "%Y.%m.%d")
+                # PGN uses YYYY.MM.DD, Django uses YYYY-MM-DD
+                event_date = game.headers["EventDate"].replace('.', '-')
+            except ValueError:
+                # Replace invalid date formats with NULL
+                print("Ignoring invalid date in pgn file : "
+                      + game.headers["EventDate"])
+                event_date = None
+        else:
+            event_date = None
+
+        event = models.find_or_add_event(
+            game.headers["Event"],
+            owner,
+            start_date=event_date
+        )
 
     if game.headers["Site"] == "?":
         location = None
@@ -106,6 +142,7 @@ def load_game(game, owner):
             # PGN uses YYYY.MM.DD, Django uses YYYY-MM-DD
             date = game.headers["Date"].replace('.', '-')
         except ValueError:
+            # Replace invalid date formats with NULL
             print("Ignoring invalid date in pgn file : "
                   + game.headers["Date"])
             date = None
@@ -121,9 +158,8 @@ def load_game(game, owner):
         location=location,
         start_date=date
     )
-    # Replace invalid date formats with NULL
     g.save()
-    return g
+    return g, obj
 
 
 def load_file(file, owner):

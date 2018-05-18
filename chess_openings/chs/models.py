@@ -43,7 +43,6 @@ class Object(models.Model):
 def create_obj(account):
     obj = Object(owner=account)
     obj.save()
-    account.can_edit.add(obj)
     return obj
 
 
@@ -82,7 +81,7 @@ def find_player(firstname, lastname):
     return Player.objects.filter(firstname=firstname, lastname=lastname)
 
 
-def find_or_add_player(firstname, lastname, owner):
+def find_or_add_player(firstname, lastname, owner, **kwargs):
     """Search a player by name, creates it if not found."""
     res = find_player(firstname, lastname)
     if res.exists():
@@ -93,7 +92,8 @@ def find_or_add_player(firstname, lastname, owner):
         player = Player(
             object=obj,
             firstname=firstname,
-            lastname=lastname
+            lastname=lastname,
+            **kwargs
         )
         player.save()
         return player
@@ -124,7 +124,7 @@ class Event(models.Model):
         return super(Event, self).delete() + obj.delete()
 
 
-def find_or_add_event(name, owner):
+def find_or_add_event(name, owner, **kwargs):
     """Search an event by name, creates it if not found."""
     res = Event.objects.filter(event_name=name)
     if res.exists():
@@ -134,7 +134,8 @@ def find_or_add_event(name, owner):
         obj.save()
         event = Event(
             object=obj,
-            event_name=name
+            event_name=name,
+            **kwargs
         )
         event.save()
         return event

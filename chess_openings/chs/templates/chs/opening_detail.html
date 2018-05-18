@@ -15,92 +15,97 @@
 <nav> </nav>
 
 <section>
-{{opening.opening_name}}
+  <h1>{{opening.opening_name}}</h1>
+  <div id="chessboard">
+    <div id="board"></div>
+    <ul class="move-menu">
+      <li class="prev"> <button type="button" onclick="prev_move(); update()">prev</button> </li>
+      <li class="reset"><button type="button" onclick="goto_move(0); update()">reset</button> </li>
+      <li class="next"><button type="button" onclick="next_move(); update()">next</button> </li>
+    </ul>
+  </div>
+  <p id="moves_text"></p>
+  <script>
+  var moves = [
+    {% for move in opening.moves_san %}"{{move}}",{% endfor %}
+  ];
+  var moves_len = moves.length;
 
-<div id="board" style="width: 400px"></div>
-<button type="button" onclick="prev_move(); update()">prev</button>
-<button type="button" onclick="next_move(); update()">next</button>
-<button type="button" onclick="goto_move(0); update()">reset</button>
-<p id="moves_text"></p>
-<script>
-var moves = [
-  {% for move in opening.moves_san %}"{{move}}",{% endfor %}
-];
-var moves_len = moves.length;
+  var game = new Chess();
 
-var game = new Chess();
+  var cfg = {
+    position: 'start'
+  };
+  var board = ChessBoard('board', cfg);
 
-var cfg = {
-  position: 'start'
-};
-var board = ChessBoard('board', cfg);
-function set_board_position() {
-  board.position(game.fen());
-}
-
-var current_move = 0;
-function prev_move() {
-  if (current_move > 0) {
-    current_move--;
-    game.undo();
+  function set_board_position(use_animation = true) {
+    board.position(game.fen(), use_animation);
   }
-}
-function next_move() {
-  if (current_move < moves_len) {
-    game.move(moves[current_move]);
-    current_move++;
-  }
-}
-function goto_move(i) {
-  if (i >= 0 && i <= moves_len) {
-    while(current_move < i) next_move();
-    while(current_move > i) prev_move();
-  }
-}
-function update() {
-  set_board_position();
-  set_moves_text();
-}
 
-function move_text(i) {
-  return '<span onclick="goto_move(' + (i+1) + '); update()">' + moves[i] + '</span>';
-}
-function set_moves_text() {
-  text = "";
-  for (i=0; i<moves_len; i++) {
-    str = move_text(i) + " ";
-    if ((i+1) === current_move) str = str.bold();
-    text += str;
+  var current_move = 0;
+  function prev_move() {
+    if (current_move > 0) {
+      current_move--;
+      game.undo();
+    }
   }
-  document.getElementById("moves_text").innerHTML = text;
-}
-set_moves_text();
-</script>
+  function next_move() {
+    if (current_move < moves_len) {
+      game.move(moves[current_move]);
+      current_move++;
+    }
+  }
+  function goto_move(i) {
+    if (i >= 0 && i <= moves_len) {
+      while(current_move < i) next_move();
+      while(current_move > i) prev_move();
+    }
+  }
+  function update(use_animation = true) {
+    set_board_position(use_animation);
+    set_moves_text();
+  }
 
-<h3>Games</h3>
-<ul>
-{% for game in opening_games %}
-  <li><a href="{% url 'chess:game' game.object_id %}">{{ game }}</a></li>
-{% endfor %}
-</ul>
-<a href="{% url 'chess:game_list' %}?opening={{opening.opening_name|urlencode}}">all games</a>
-<h3>Variations</h3>
-<ul>
-{% for opening in variations %}
-  <li><a href="{% url 'chess:opening' opening.object_id %}">{{ opening }}</a></li>
-{% endfor %}
-</ul>
-<h3>Variation of</h3>
-<ul>
-{% for opening in variation_of %}
-  <li><a href="{% url 'chess:opening' opening.object_id %}">{{ opening }}</a></li>
-{% endfor %}
-</ul>
+  function move_text(i) {
+    return '<span onclick="goto_move(' + (i+1) + '); update()">' + moves[i] + '</span>';
+  }
+  function set_moves_text() {
+    text = "";
+    for (i=0; i<moves_len; i++) {
+      str = move_text(i) + " ";
+      if ((i+1) === current_move) str = str.bold();
+      text += str;
+    }
+    document.getElementById("moves_text").innerHTML = text;
+  }
+  goto_move(moves_len);
+  update(false);
+  </script>
+
+  <h3>Games</h3>
+  <ul>
+  {% for game in opening_games %}
+    <li><a href="{% url 'chess:game' game.object_id %}">{{ game }}</a></li>
+  {% endfor %}
+  </ul>
+  <a href="{% url 'chess:game_list' %}?opening={{opening.opening_name|urlencode}}">all games</a>
+  <h3>Variations</h3>
+  <ul>
+  {% for opening in variations %}
+    <li><a href="{% url 'chess:opening' opening.object_id %}">{{ opening }}</a></li>
+  {% endfor %}
+  </ul>
+  <h3>Variation of</h3>
+  <ul>
+  {% for opening in variation_of %}
+    <li><a href="{% url 'chess:opening' opening.object_id %}">{{ opening }}</a></li>
+  {% endfor %}
+  </ul>
 
 {% include "chs/comments.html" %}
 {% if can_edit %}
-<a href="{% url 'chess:opening_edit' opening.object_id %}">edit</a>
-<a href="{% url 'chess:opening_delete' opening.object_id %}">delete</a>
+  <a href="{% url 'chess:opening_edit' opening.object_id %}">edit</a>
+  <a href="{% url 'chess:opening_delete' opening.object_id %}">delete</a>
 {% endif %}
 </section>
 {% endblock %}

@@ -14,34 +14,19 @@
 {% block content %}
 <nav></nav>
 
-{% if game.white %}
-<a href="{% url 'chess:player' game.white.object_id %}"> {{game.white}} </a>
-{% else %}
-unknown
-{% endif %}
-vs
-{% if game.black %}
-<a href="{% url 'chess:player' game.black.object_id %}"> {{game.black}} </a>
-{% else %}
-unknown
-{% endif %}
-: {{game.result}}
-<br/>
-{% if game.event %}
-<a href="{% url 'chess:event' game.event.object_id %}"> {{game.event.event_name}} </a>,
-{% endif %}
-{% if game.location %}
-{{game.location}},
-{% endif %}
-{% if game.start_date %}
-{{game.start_date.strftime}}
-{% endif %}
-
 <section>
   <h2>
-    <a href="{% url 'chess:player' game.white.object_id %}"> {{game.white}}</a>
+    {% if game.white %}
+    <a href="{% url 'chess:player' game.white.object_id %}"> {{game.white}} </a>
+    {% else %}
+    unknown
+    {% endif %}
     vs
+    {% if game.black %}
     <a href="{% url 'chess:player' game.black.object_id %}"> {{game.black}} </a>
+    {% else %}
+    unknown
+    {% endif %}
     : {{game.result}}
   </h2>
   <br/>
@@ -55,7 +40,15 @@ unknown
     {{game.start_date.strftime}}
   {% endif %}
 
-  <div id="board">
+  <div id="chessboard">
+    <div id="board"></div>
+    <ul class="move-menu">
+      <li class="prev"> <button type="button" onclick="prev_move(); update()">prev</button> </li>
+      <li class="reset"><button type="button" onclick="goto_move(0); update()">reset</button> </li>
+      <li class="next"><button type="button" onclick="next_move(); update()">next</button> </li>
+    </ul>
+  </div>
+  <p id="moves_text"></p>
   <script>
   var moves = [
     {% for move in game.moves_san %}"{{move}}",{% endfor %}
@@ -68,8 +61,9 @@ unknown
     position: 'start'
   };
   var board = ChessBoard('board', cfg);
-  function set_board_position() {
-    board.position(game.fen());
+
+  function set_board_position(use_animation = true) {
+    board.position(game.fen(), use_animation);
   }
 
   var current_move = 0;
@@ -91,8 +85,8 @@ unknown
       while(current_move > i) prev_move();
     }
   }
-  function update() {
-    set_board_position();
+  function update(use_animation = true) {
+    set_board_position(use_animation);
     set_moves_text();
   }
 
@@ -102,23 +96,18 @@ unknown
   function set_moves_text() {
     text = "";
     for (i=0; i<moves_len; i++) {
-      str = move_text(i) + " ";
+      prefix = "";
+      if(!(i%2)) prefix = i/2 + ". "
+      str = move_text(i);
       if ((i+1) === current_move) str = str.bold();
-      text += str;
+      text += prefix + str + " ";
     }
     text += "{{game.result}}";
     document.getElementById("moves_text").innerHTML = text;
   }
-  set_moves_text();
+  goto_move(moves_len);
+  update(false);
   </script>
-
-  <ul class="move-menu">
-    <li class="prev"> <button type="button" onclick="prev_move(); update()">prev</button> </li>
-    <li class="reset"><button type="button" onclick="goto_move(0); update()">reset</button> </li>
-    <li class="next"><button type="button" onclick="next_move(); update()">next</button> </li>
-  </ul>
-  <p id="moves_text"></p>
-  </div>
 
   <h3>Openings</h3>
   <ul>

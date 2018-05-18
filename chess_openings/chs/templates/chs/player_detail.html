@@ -7,6 +7,8 @@
 
 <section>
 {{player}}
+{% if player.elo_rating %}(Elo: {{player.elo_rating}}){% endif %}
+{% if player.nationality %}, {{player.nationality}}{% endif %}
 <ul>
 {% for game in player_games %}
   <li><a href="{% url 'chess:game' game.object_id %}">{{ game }}</a></li>
