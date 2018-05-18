@@ -214,12 +214,8 @@ input[type="submit"]:hover {
     background-color: #e8ab2e;
 }
 
-.paginator {
-    display: inline-block;
-    margin: auto;
-}
 
-.outer-center {
+.paginator {
     float: right;
     right: 50%;
     position: relative;
