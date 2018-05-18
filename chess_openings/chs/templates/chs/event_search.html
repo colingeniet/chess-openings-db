@@ -5,10 +5,15 @@
 {% block title %}search events{% endblock %}
 
 {% block content %}
-<form action="{% url 'chess:event_list' %}" method="get">
-  Name:<input name="name"/><br/>
-  Location:<input name="location"/><br/>
-  After:<input type="date" name="after"/> Before:<input type="date" name="before"/><br/>
-  <input type="submit" value="Search"/>
-</form>
+  <nav></nav>
+
+  <section>
+    <h1>Event search </h1>
+    <form action="{% url 'chess:event_list' %}" method="get">
+      Name:<input name="name"/><br/>
+      Location:<input name="location"/><br/>
+      After:<input type="date" name="after"/> Before:<input type="date" name="before"/><br/>
+      <input type="submit" value="Search"/>
+    </form>
+  </section>
 {% endblock %}

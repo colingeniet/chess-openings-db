@@ -12,6 +12,9 @@
 {% endblock %}
 
 {% block content %}
+<nav> </nav>
+
+<section>
 <form action="{% url 'chess:game_list' %}" method="get">
   <div id="board" style="width: 400px"></div>
   <p id="moves_text"></p>
@@ -93,4 +96,5 @@
   After:<input type="date" name="after"/> Before:<input type="date" name="before"/><br/>
   <input type="submit" value="Search"/>
 </form>
+</section>
 {% endblock %}

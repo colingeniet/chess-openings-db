@@ -12,6 +12,9 @@
 {% endblock %}
 
 {% block content %}
+<nav> </nav>
+
+<section>
 {{opening.opening_name}}
 
 <div id="board" style="width: 400px"></div>
@@ -99,4 +102,5 @@ set_moves_text();
 <a href="{% url 'chess:opening_edit' opening.object_id %}">edit</a>
 <a href="{% url 'chess:opening_delete' opening.object_id %}">delete</a>
 {% endif %}
+</section>
 {% endblock %}

@@ -5,6 +5,9 @@
 {% block title %}create player{% endblock %}
 
 {% block content %}
+<nav></nav>
+
+<section>
 {% if request.session.account %}
 <form action="{% url 'chess:player_add' %}" method="post">
   {% csrf_token %}
@@ -20,4 +23,5 @@
 {% else %}
 <p>You need to be logged in to create new objects</p>
 {% endif %}
+</section>
 {% endblock %}

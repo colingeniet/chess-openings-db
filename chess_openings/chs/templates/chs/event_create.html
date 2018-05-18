@@ -5,19 +5,23 @@
 {% block title %}create event{% endblock %}
 
 {% block content %}
+<nav></nav>
+
+<section>
 {% if request.session.account %}
-<form action="{% url 'chess:event_add' %}" method="post">
-  {% csrf_token %}
-  {% if event %}
-  <input type="hidden" name="id" value="{{event.object_id}}"/>
-  {% endif %}
-  Name:<input name="event_name" required="required" maxlength="60" {% if event.event_name %}value="{{event.event_name}}"{% endif %}/><br/>
-  Location:<input name="location" maxlength="60" {% if event.location %}value="{{event.location}}"{% endif %}/><br/>
-  Starts:<input type="date" name="start_date" {% if event.start_date %}value="{{event.start_date.isoformat}}"{% endif %}/>
-  Ends:<input type="date" name="end_date" {% if event.end_date %}value="{{event.end_date.isoformat}}"{% endif %}/><br/>
-  <input type="submit" value="{% if event %}Modify{% else %}Add{% endif %}"/>
-</form>
+  <form action="{% url 'chess:event_add' %}" method="post">
+    {% csrf_token %}
+    {% if event %}
+    <input type="hidden" name="id" value="{{event.object_id}}"/>
+    {% endif %}
+    Name:<input name="event_name" required="required" maxlength="60" {% if event.event_name %}value="{{event.event_name}}"{% endif %}/><br/>
+    Location:<input name="location" maxlength="60" {% if event.location %}value="{{event.location}}"{% endif %}/><br/>
+    Starts:<input type="date" name="start_date" {% if event.start_date %}value="{{event.start_date.isoformat}}"{% endif %}/>
+    Ends:<input type="date" name="end_date" {% if event.end_date %}value="{{event.end_date.isoformat}}"{% endif %}/><br/>
+    <input type="submit" value="{% if event %}Modify{% else %}Add{% endif %}"/>
+  </form>
 {% else %}
-<p>You need to be logged in to create new objects</p>
+  <p>You need to be logged in to create new objects</p>
 {% endif %}
+</section>
 {% endblock %}

@@ -3,29 +3,34 @@
 {% block title %}events{% endblock %}
 
 {% block content %}
-<script>active_navlink("nav_events");</script>
-<a href="{% url 'chess:event_search' %}">search</a>
-{% if request.session.account %}
-<a href="{% url 'chess:event_create' %}">create</a>
-{% endif %}
-{% include "chs/paginator.html" %}
-<table>
-  <tr>
-    <th>event</th>
-    <th>site</th>
-    <th>starts</th>
-    <th>ends</th>
-    <th><!-- detail column --></th>
-  </tr>
-{% for event in event_list %}
-  <tr>
-    <td>{{ event.event_name }}</td>
-    <td>{{ event.location }}</td>
-    <td>{{ event.start_date }}</td>
-    <td>{{ event.end_date }}</td>
-    <td><a href="{% url 'chess:event' event.object_id %}">detail</a></td>
-  </tr>
-{% endfor %}
-</table>
-{% include "chs/paginator.html" %}
+  <nav></nav>
+
+  <section>
+    <h1> Events list </h1>
+    <script>active_navlink("nav_events");</script>
+    <a href="{% url 'chess:event_search' %}">search</a>
+    {% if request.session.account %}
+      <a href="{% url 'chess:event_create' %}">create</a>
+    {% endif %}
+    {% include "chs/paginator.html" %}
+    <table>
+      <tr>
+        <th>event</th>
+        <th>site</th>
+        <th>starts</th>
+        <th>ends</th>
+        <th><!-- detail column --></th>
+      </tr>
+    {% for event in event_list %}
+      <tr>
+        <td>{{ event.event_name }}</td>
+        <td>{{ event.location }}</td>
+        <td>{{ event.start_date }}</td>
+        <td>{{ event.end_date }}</td>
+        <td><a href="{% url 'chess:event' event.object_id %}">detail</a></td>
+      </tr>
+    {% endfor %}
+    </table>
+    {% include "chs/paginator.html" %}
+  </section>
 {% endblock %}

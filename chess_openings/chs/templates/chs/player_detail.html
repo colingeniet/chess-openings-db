@@ -3,6 +3,9 @@
 {% block title %}{{player}}{% endblock %}
 
 {% block content %}
+<nav> </nav>
+
+<section>
 {{player}}
 <ul>
 {% for game in player_games %}
@@ -16,4 +19,5 @@
 <a href="{% url 'chess:player_edit' player.object_id %}">edit</a>
 <a href="{% url 'chess:player_delete' player.object_id %}">delete</a>
 {% endif %}
+</section>
 {% endblock %}

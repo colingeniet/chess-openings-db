@@ -3,6 +3,8 @@
 {% block title %}login{% endblock %}
 
 {% block content %}
+<nav> </nav>
+<section>
 {% if error %}
 <p>Error : {{error}}</p>
 {% endif %}
@@ -17,4 +19,5 @@
   <input type="hidden" name="next" value="{{request.GET.next}}"/>
   {% endif %}
 </form>
+</section>
 {% endblock %}
