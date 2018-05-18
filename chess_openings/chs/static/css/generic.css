@@ -26,12 +26,12 @@ header a {
     color: white;
 }
 
-#header-elt {
+.header-elt {
     display: inline-block;
     padding : 0 2vw;
 }
 
-#header-login {
+.header-login {
     display: inline-block;
     position: absolute;
     right: 0px;
@@ -42,11 +42,11 @@ header a {
     margin: auto;
 }
 
-#header-login #header-elt {
+.header-login .header-elt {
     padding : 0 1vw;
 }
 
-#header-elt a:hover {
+.header-elt a:hover {
     display: inline-block;
     background-color: rgb(178, 178, 178);
     padding-left: 0.5vw;
@@ -221,6 +221,7 @@ input[type="submit"]:hover {
 .paginator a.current_page {
     background-color: #ddd;
 }
+
 .paginator a:hover:not(.current_page) {
     background-color: #ccc;
 }
