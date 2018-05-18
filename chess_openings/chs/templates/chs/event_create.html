@@ -20,7 +20,7 @@
       <label for="start_date">Starts:</label><input type="date" name="start_date" {% if event.start_date %}value="{{event.start_date.isoformat}}"{% endif %}/>
       <label for="end_date">Ends:</label><input type="date" name="end_date" {% if event.end_date %}value="{{event.end_date.isoformat}}"{% endif %}/><br/>
       <input type="submit" value="{% if event %}Modify{% else %}Add{% endif %}"/>
-    </fieldset
+    </fieldset>
   </form>
 {% else %}
   <p>You need to be logged in to create new objects</p>
