@@ -195,6 +195,11 @@ class GameList(PaginatedListView):
             )
         if is_set('white_nat'):
             result = result.filter(white__nationality=query['white_nat'])
+        if is_set('white_elo_min'):
+            result = result.filter(white__elo_rating__gte=query['white_elo_min'])
+        if is_set('white_elo_max'):
+            result = result.filter(white__elo_rating__lte=query['white_elo_max'])
+
         if is_set('black'):
             result = result.filter(
                 Q(black__lastname__icontains=query['black'])
@@ -202,6 +207,11 @@ class GameList(PaginatedListView):
             )
         if is_set('black_nat'):
             result = result.filter(white__nationality=query['black_nat'])
+        if is_set('black_elo_min'):
+            result = result.filter(black__elo_rating__gte=query['black_elo_min'])
+        if is_set('black_elo_max'):
+            result = result.filter(black__elo_rating__lte=query['black_elo_max'])
+
         if is_set('opening'):
             try:
                 opening = models.Opening.objects.get(
@@ -213,6 +223,7 @@ class GameList(PaginatedListView):
         if is_set('moves'):
             moves = pgn.encode_moves_from_uci(query['moves'].split(','))
             result = result.filter(moves__chs_startswith=moves)
+
         if is_set('player'):
             def condition(table):
                 sql = 'UPPER(%s.lastname) = UPPER(%s) OR UPPER(%s.firstname) = UPPER(%s)'
@@ -233,6 +244,28 @@ class GameList(PaginatedListView):
                 result.query.get_initial_alias(),
                 condition,
                 [query['player_nat']]
+            )
+            result.query.join(join, [])
+        if is_set('player_elo_min'):
+            def condition(table):
+                sql = '%s.elo_rating >= %s'
+                return sql % (table, '%s')
+
+            join = PlayerLookupJoin(
+                result.query.get_initial_alias(),
+                condition,
+                [query['player_elo_min']]
+            )
+            result.query.join(join, [])
+        if is_set('player_elo_max'):
+            def condition(table):
+                sql = '%s.elo_rating <= %s'
+                return sql % (table, '%s')
+
+            join = PlayerLookupJoin(
+                result.query.get_initial_alias(),
+                condition,
+                [query['player_elo_max']]
             )
             result.query.join(join, [])
         return result.order_by('start_date')

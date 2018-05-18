@@ -63,7 +63,8 @@ class Player(models.Model):
     nationality = models.CharField(max_length=3, null=True, db_index=True)
 
     def __str__(self):
-        return self.firstname + " " + self.lastname
+        elo_str = " ({})".format(self.elo_rating) if self.elo_rating else ""
+        return "{} {}{}".format(self.firstname, self.lastname, elo_str)
 
     def pgn_str(self):
         return self.lastname + ", " + self.firstname

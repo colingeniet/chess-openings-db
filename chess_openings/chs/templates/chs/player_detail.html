@@ -9,11 +9,10 @@
 {{player}}
 {% if player.elo_rating %}(Elo: {{player.elo_rating}}){% endif %}
 {% if player.nationality %}, {{player.nationality}}{% endif %}
-<ul>
-{% for game in player_games %}
-  <li><a href="{% url 'chess:game' game.object_id %}">{{ game }}</a></li>
-{% endfor %}
-</ul>
+
+{% with game_list=player_games %}
+{% include "chs/game_table.html" %}
+{% endwith %}
 <a href="{% url 'chess:game_list' %}?player={{player.lastname|urlencode}}">all games</a>
 
 {% include "chs/comments.html" %}

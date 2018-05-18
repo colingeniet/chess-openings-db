@@ -83,24 +83,20 @@
   </script>
 
   <h3>Games</h3>
-  <ul>
-  {% for game in opening_games %}
-    <li><a href="{% url 'chess:game' game.object_id %}">{{ game }}</a></li>
-  {% endfor %}
-  </ul>
+  {% with game_list=opening_games %}
+  {% include "chs/game_table.html" %}
+  {% endwith %}
   <a href="{% url 'chess:game_list' %}?opening={{opening.opening_name|urlencode}}">all games</a>
+
   <h3>Variations</h3>
-  <ul>
-  {% for opening in variations %}
-    <li><a href="{% url 'chess:opening' opening.object_id %}">{{ opening }}</a></li>
-  {% endfor %}
-  </ul>
+  {% with opening_list=variations %}
+  {% include "chs/opening_table.html" %}
+  {% endwith %}
+
   <h3>Variation of</h3>
-  <ul>
-  {% for opening in variation_of %}
-    <li><a href="{% url 'chess:opening' opening.object_id %}">{{ opening }}</a></li>
-  {% endfor %}
-  </ul>
+  {% with opening_list=variation_of %}
+  {% include "chs/opening_table.html" %}
+  {% endwith %}
 
 {% include "chs/comments.html" %}
 {% if can_edit %}

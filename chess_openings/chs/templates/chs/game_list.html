@@ -13,46 +13,13 @@
 <a href="{% url 'chess:game_create' %}">create</a>
 {% endif %}
 <p>
-  games : {{game_number}} </br>
-  white wins : {{white_wins}} ({{white_percent}}%) </br>
-  black wins : {{black_wins}} ({{black_percent}}%) </br>
-  draws : {{draws}} ({{draws_percent}}%) </br>
+  games : {{game_number}} <br/>
+  white wins : {{white_wins}} ({{white_percent}}%) <br/>
+  black wins : {{black_wins}} ({{black_percent}}%) <br/>
+  draws : {{draws}} ({{draws_percent}}%) <br/>
 </p>
 {% include "chs/paginator.html" %}
-<table>
-  <tr>
-    <th>white</th>
-    <th>black</th>
-    <th>result</th>
-    <th>event</th>
-    <th>location</th>
-    <th>date</th>
-    <th><!-- detail column --></th>
-  </tr>
-{% for game in game_list %}
-  <tr>
-    {% if game.white %}
-    <td><a href="{% url 'chess:player' game.white.object_id %}">{{game.white}}</a></td>
-    {% else %}
-    <td>unknown</td>
-    {% endif %}
-    {% if game.black %}
-    <td><a href="{% url 'chess:player' game.black.object_id %}">{{game.black}}</a></td>
-    {% else %}
-    <td>unknown</td>
-    {% endif %}
-    <td>{{game.result}}</td>
-    {% if game.event %}
-    <td><a href="{% url 'chess:event' game.event.object_id %}">{{game.event.event_name}}</a></td>
-    {% else %}
-    <td></td>
-    {% endif %}
-    <td>{{game.location}}</td>
-    <td>{{game.start_date}}</td>
-    <td><a href="{% url 'chess:game' game.object_id %}">detail</a></td>
-  </tr>
-{% endfor %}
-</table>
+{% include "chs/game_table.html" %}
 {% include "chs/paginator.html" %}
 </section>
 {% endblock %}

@@ -13,7 +13,7 @@
     <form action="{% url 'chess:event_add' %}" method="post">
       <fieldset> <legend> Event {% if event %} modification : {% else %} creation{% endif %}</legend>
         {% csrf_token %}
-        {% if event %} 
+        {% if event %}
           <input type="hidden" name="id" value="{{event.object_id}}"/>
         {% endif %}
         <label for="name">Name:</label><input name="event_name" required="required" maxlength="60" {% if event.event_name %}value="{{event.event_name}}"{% endif %}/><br/>
