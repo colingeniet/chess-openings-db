@@ -224,3 +224,12 @@ input[type="submit"]:hover {
 .paginator a:hover:not(.current_page) {
     background-color: #ccc;
 }
+
+.comment {
+    margin-top: 10px;
+    border-top: 2px solid rgb(210, 220, 200);
+}
+
+.hour {
+    text-align: right;
+}
