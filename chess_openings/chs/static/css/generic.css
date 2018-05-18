@@ -11,9 +11,14 @@ body {
     margin: 0;
 }
 
+table {
+    border-collapse: separate;
+    border-spacing: 5px 2px;
+}
+
 header {
-    margin : 0;
-    background-color : black;
+    margin: 0;
+    background-color: black;
 }
 
 header a {
