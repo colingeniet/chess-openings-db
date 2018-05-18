@@ -13,7 +13,8 @@ body {
 
 table {
     border-collapse: separate;
-    border-spacing: 5px 2px;
+    border-spacing: 10px 5px;
+    margin: auto;
 }
 
 header {
