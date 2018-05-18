@@ -3,24 +3,20 @@
 {% block title %}games{% endblock %}
 
 {% block content %}
-<nav></nav>
-
-<section>
-  <h1>Games list</h1>
-  <script>active_navlink("nav_games");</script>
-  You can <a href="{% url 'chess:game_search' %}">search</a>
-  {% if request.session.account %}
-    or <a href="{% url 'chess:game_create' %}">create</a>
-  {% endif %}
-  games.
-  <p>
-    The website contains {{game_number}} games. <br/>
-    white wins : {{white_wins}} ({{white_percent}}%) <br/>
-    black wins : {{black_wins}} ({{black_percent}}%) <br/>
-    draws : {{draws}} ({{draws_percent}}%) <br/>
-  </p>
-  {% include "chs/paginator.html" %}
-  {% include "chs/game_table.html" %}
-  {% include "chs/paginator.html" %}
-</section>
+<h1>Games list</h1>
+<script>active_navlink("nav_games");</script>
+You can <a href="{% url 'chess:game_search' %}">search</a>
+{% if request.session.account %}
+  or <a href="{% url 'chess:game_create' %}">create</a>
+{% endif %}
+games.
+<p>
+  The website contains {{game_number}} games. <br/>
+  white wins : {{white_wins}} ({{white_percent}}%) <br/>
+  black wins : {{black_wins}} ({{black_percent}}%) <br/>
+  draws : {{draws}} ({{draws_percent}}%) <br/>
+</p>
+{% include "chs/paginator.html" %}
+{% include "chs/game_table.html" %}
+{% include "chs/paginator.html" %}
 {% endblock %}

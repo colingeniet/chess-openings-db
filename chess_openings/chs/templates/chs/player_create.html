@@ -5,26 +5,22 @@
 {% block title %}create player{% endblock %}
 
 {% block content %}
-<nav></nav>
-
-<section>
-  <h1>Player {% if player %} Modification {% else %} Creation {% endif %}</h1>
-  {% if request.session.account %}
-  <form action="{% url 'chess:player_add' %}" method="post">
-    <fieldset><legend>Player {% if player %} modification {% else %} creation {% endif %}</legend>
-    {% csrf_token %}
-    {% if player %}
-      <input type="hidden" name="id" value="{{player.object_id}}"/>
-    {% endif %}
-    <label for="firstname">Firstname:</label><input name="firstname" maxlength="50" {% if player.firstname %}value="{{player.firstname}}"{% endif %}/>
-    <label for="lastname">Lastname:</label><input name="lastname" maxlength="50" {% if player.lastname %}value="{{player.lastname}}"{% endif %}/><br/>
-    <label for="nationality">Nationality:</label><input name="nationality" maxlength="3" {% if player.nationality %}value="{{player.nationality}}"{% endif %}/><br/>
-    <label for="elo">ELO:</label><input type="number" name="elo" {% if player.elo_rating %}value="{{player.elo_rating}}"{% endif %}/><br/>
-    <input type="submit" value="{% if player %}Modify{% else %}Add{% endif %}"/>
-    </fieldset>
-  </form>
-  {% else %}
-    <p><a href="{% url 'chess:login' %}">You need to be logged in to create new objects</a></p>
+<h1>Player {% if player %} Modification {% else %} Creation {% endif %}</h1>
+{% if request.session.account %}
+<form action="{% url 'chess:player_add' %}" method="post">
+  <fieldset><legend>Player {% if player %} modification {% else %} creation {% endif %}</legend>
+  {% csrf_token %}
+  {% if player %}
+    <input type="hidden" name="id" value="{{player.object_id}}"/>
   {% endif %}
-</section>
+  <label for="firstname">Firstname:</label><input name="firstname" maxlength="50" {% if player.firstname %}value="{{player.firstname}}"{% endif %}/>
+  <label for="lastname">Lastname:</label><input name="lastname" maxlength="50" {% if player.lastname %}value="{{player.lastname}}"{% endif %}/><br/>
+  <label for="nationality">Nationality:</label><input name="nationality" maxlength="3" {% if player.nationality %}value="{{player.nationality}}"{% endif %}/><br/>
+  <label for="elo">ELO:</label><input type="number" name="elo" {% if player.elo_rating %}value="{{player.elo_rating}}"{% endif %}/><br/>
+  <input type="submit" value="{% if player %}Modify{% else %}Add{% endif %}"/>
+  </fieldset>
+</form>
+{% else %}
+<p><a href="{% url 'chess:login' %}">You need to be logged in to create new objects</a></p>
+{% endif %}
 {% endblock %}

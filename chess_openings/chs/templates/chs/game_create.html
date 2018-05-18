@@ -12,34 +12,31 @@
 {% endblock %}
 
 {% block content %}
-<nav></nav>
-
-<section>
-  <h1>Game {% if game %} modification {% else %} creation{% endif %}</h1>
-  {% if request.session.account %}
-    <form action="{% url 'chess:game_add' %}" method="post">
-      <fieldset>
-        <legend>{% if game %} Game modification {% else %} New game {% endif %}</legend>
-        {% csrf_token %}
-        {% if game %}
-          <input type="hidden" name="id" value="{{game.object_id}}"/>
-        {% endif %}
-        <div id="chessboard">
-          <div id="board"></div>
-          <input type="hidden" id="moves_input" name="moves"/>
-          <ul class="move-menu">
-            <li class="prev"><button type="button" onclick="undo()">Undo</button></li>
-            <li class="next"><button type="button" onclick="reset_board()">Reset</button><br/></li>
-          </ul>
-        </div>
-        <p id="moves_text"></p>
-        <label for="result">Result:</label><select id="result_input" name="result">
-          <option value="1-0">White wins (1-0)</option>
-          <option value="0-1">Black wins (0-1)</option>
-          <option value="1/2-1/2">Draw (1/2-1/2)</option>
-          <option value="*" selected>Ongoing - Other (*)</option>
-        </select>
-        <script>
+<h1>Game {% if game %} modification {% else %} creation{% endif %}</h1>
+{% if request.session.account %}
+<form action="{% url 'chess:game_add' %}" method="post">
+  <fieldset>
+    <legend>{% if game %} Game modification {% else %} New game {% endif %}</legend>
+    {% csrf_token %}
+    {% if game %}
+      <input type="hidden" name="id" value="{{game.object_id}}"/>
+    {% endif %}
+    <div id="chessboard">
+      <div id="board"></div>
+      <input type="hidden" id="moves_input" name="moves"/>
+      <ul class="move-menu">
+        <li class="prev"><button type="button" onclick="undo()">Undo</button></li>
+        <li class="next"><button type="button" onclick="reset_board()">Reset</button><br/></li>
+      </ul>
+    </div>
+    <p id="moves_text"></p>
+    <label for="result">Result:</label><select id="result_input" name="result">
+      <option value="1-0">White wins (1-0)</option>
+      <option value="0-1">Black wins (0-1)</option>
+      <option value="1/2-1/2">Draw (1/2-1/2)</option>
+      <option value="*" selected>Ongoing - Other (*)</option>
+    </select>
+    <script>
     {% if game.moves %}
     var moves = [
       {% for move in game.moves_san %}"{{move}}",{% endfor %}
@@ -136,41 +133,40 @@
     {% if game.result %}
     result_input.value = "{{game.result}}";
     {% endif %}
-        </script>
-        <label for="white_first">White firstname:</label><input name="white_first" maxlength="50" {% if game.white %}value="{{game.white.firstname}}"{% endif %}/>
-        <label for="white_last">White lastname:</label><input name="white_last" maxlength="50" {% if game.white %}value="{{game.white.lastname}}"{% endif %}/><br/>
-        <label for="black_first">Black firstname:</label><input name="black_first" maxlength="50" {% if game.black %}value="{{game.black.firstname}}"{% endif %}/>
-        <label for="black_lasrt">Black lastname:</label><input name="black_last" maxlength="50" {% if game.black %}value="{{game.black.lastname}}"{% endif %}/><br/>
-        <label for="event">Event:</label><input name="event" maxlength="60"  {% if game.event %}value="{{game.event.event_name}}"{% endif %}/><br/>
-        <label for="location">Site:</label><input name="location" maxlength="60" {% if game.location %}value="{{game.location}}"{% endif %}/><br/>
-        <label for="date">Date:</label><input type="date" name="date" {% if game.start_date %}value="{{game.start_date.isoformat}}"{% endif %}/><br/>
-        <input type="submit" value="{% if game %}Modify{% else %}Add{% endif %}"/>
-      </fieldset>
-    </form>
-    {% if not game %}
-      <p>or</p>
-      <script>
-      var chess = new Chess();
-      function validate_pgn_form() {
-        var pgn = document.forms["pgn_form"]["pgn"].value;
-        if(!chess.load_pgn(pgn)) {
-          alert("Invalid pgn file");
-          return false;
-        }
-        return true;
-      }
-      </script>
+    </script>
+    <label for="white_first">White firstname:</label><input name="white_first" maxlength="50" {% if game.white %}value="{{game.white.firstname}}"{% endif %}/>
+    <label for="white_last">White lastname:</label><input name="white_last" maxlength="50" {% if game.white %}value="{{game.white.lastname}}"{% endif %}/><br/>
+    <label for="black_first">Black firstname:</label><input name="black_first" maxlength="50" {% if game.black %}value="{{game.black.firstname}}"{% endif %}/>
+    <label for="black_lasrt">Black lastname:</label><input name="black_last" maxlength="50" {% if game.black %}value="{{game.black.lastname}}"{% endif %}/><br/>
+    <label for="event">Event:</label><input name="event" maxlength="60"  {% if game.event %}value="{{game.event.event_name}}"{% endif %}/><br/>
+    <label for="location">Site:</label><input name="location" maxlength="60" {% if game.location %}value="{{game.location}}"{% endif %}/><br/>
+    <label for="date">Date:</label><input type="date" name="date" {% if game.start_date %}value="{{game.start_date.isoformat}}"{% endif %}/><br/>
+    <input type="submit" value="{% if game %}Modify{% else %}Add{% endif %}"/>
+  </fieldset>
+</form>
+{% if not game %}
+<p>or</p>
+<script>
+var chess = new Chess();
+function validate_pgn_form() {
+  var pgn = document.forms["pgn_form"]["pgn"].value;
+  if(!chess.load_pgn(pgn)) {
+    alert("Invalid pgn file");
+    return false;
+  }
+  return true;
+}
+</script>
 
-      <form name="pgn_form" action="{% url 'chess:game_add_pgn' %}" method="post" onsubmit="return validate_pgn_form()">
-        <fieldset> <legend>Upload PGN file</legend>
-          {% csrf_token %}
-          <input type="file" name="pgn"/><br/>
-          <input type="submit" value="Add from pgn" style="width: 150px"/>
-        </fieldset>
-      </form>
-    {% endif %}
-  {% else %}
-    <p>You need to be logged in to create new objects</p>
-  {% endif %}
-</section>
+<form name="pgn_form" action="{% url 'chess:game_add_pgn' %}" method="post" onsubmit="return validate_pgn_form()">
+  <fieldset> <legend>Upload PGN file</legend>
+    {% csrf_token %}
+    <input type="file" name="pgn"/><br/>
+    <input type="submit" value="Add from pgn" style="width: 150px"/>
+  </fieldset>
+</form>
+{% endif %}
+{% else %}
+<p>You need to be logged in to create new objects</p>
+{% endif %}
 {% endblock %}

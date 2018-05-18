@@ -3,25 +3,21 @@
 {% block title %}{{event.event_name}}{% endblock %}
 
 {% block content %}
-<nav></nav>
+<h1>{{event.event_name}}</h1>
 
-<section>
-  <h1>{{event.event_name}}</h1>
-  
-  From {% if event.start_date %} {{event.start_date}} {% endif %}
-  to {% if event.end_date %} {{event.end_date}} {% endif %} -
-  {% if event.location %} {{event.location}} {% endif %}
-  
-  {% with game_list=event_games %}
-    {% include "chs/game_table.html" %}
-  {% endwith %}
-  <a href="{% url 'chess:game_list' %}?event={{event.event_name|urlencode}}">all games</a>
+From {% if event.start_date %} {{event.start_date}} {% endif %}
+to {% if event.end_date %} {{event.end_date}} {% endif %} -
+{% if event.location %} {{event.location}} {% endif %}
 
-  {% include "chs/comments.html" %}
-  
-  {% if can_edit %}
-    <a href="{% url 'chess:event_edit' event.object_id %}">edit</a>
-    <a href="{% url 'chess:event_delete' event.object_id %}">delete</a>
-  {% endif %}
-</section>
+{% with game_list=event_games %}
+  {% include "chs/game_table.html" %}
+{% endwith %}
+<a href="{% url 'chess:game_list' %}?event={{event.event_name|urlencode}}">all games</a>
+
+{% include "chs/comments.html" %}
+
+{% if can_edit %}
+<a href="{% url 'chess:event_edit' event.object_id %}">edit</a>
+<a href="{% url 'chess:event_delete' event.object_id %}">delete</a>
+{% endif %}
 {% endblock %}

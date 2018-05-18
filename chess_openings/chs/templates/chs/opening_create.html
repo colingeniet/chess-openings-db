@@ -12,102 +12,98 @@
 {% endblock %}
 
 {% block content %}
-<nav> </nav>
-
-<section>
-  <h1>Opening Creation</h1>
+<h1>Opening Creation</h1>
 {% if request.session.account %}
-  <form action="{% url 'chess:opening_add' %}" method="post">
-    <fieldset><legend>Opening creation</legend>
-    {% csrf_token %}
-    {% if opening %}
-    <input type="hidden" name="id" value="{{opening.object_id}}"/>
-    {% endif %}
-    <div id="chessboard">
-      <div id="board"></div>
-      <input type="hidden" id="moves_input" name="moves"/>
-      <button type="button" onclick="undo()">Undo</button>
-      <button type="button" onclick="reset_board()">Reset</button>
-    </div>
-    <p id="moves_text"></p>
-    <script>
-    {% if opening.moves %}
-    var moves = [
-      {% for move in opening.moves_san %}"{{move}}",{% endfor %}
-    ];
-    {% else %}
-    var moves = [];
-    {% endif %}
-    var moves_len = moves.length;
+<form action="{% url 'chess:opening_add' %}" method="post">
+  <fieldset><legend>Opening creation</legend>
+  {% csrf_token %}
+  {% if opening %}
+  <input type="hidden" name="id" value="{{opening.object_id}}"/>
+  {% endif %}
+  <div id="chessboard">
+    <div id="board"></div>
+    <input type="hidden" id="moves_input" name="moves"/>
+    <button type="button" onclick="undo()">Undo</button>
+    <button type="button" onclick="reset_board()">Reset</button>
+  </div>
+  <p id="moves_text"></p>
+  <script>
+  {% if opening.moves %}
+  var moves = [
+    {% for move in opening.moves_san %}"{{move}}",{% endfor %}
+  ];
+  {% else %}
+  var moves = [];
+  {% endif %}
+  var moves_len = moves.length;
 
-    var game = new Chess();
-    for (i = 0; i < moves_len; i++) {
-      game.move(moves[i]);
+  var game = new Chess();
+  for (i = 0; i < moves_len; i++) {
+    game.move(moves[i]);
+  }
+
+  var moves_text = document.getElementById("moves_text")
+  var moves_input = document.getElementById("moves_input")
+
+  function onDragStart(source, piece) {
+    if (game.game_over() === true ||
+        (game.turn() === 'w' && piece.search(/^b/) !== -1) ||
+        (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
+      return false;
     }
+  }
 
-    var moves_text = document.getElementById("moves_text")
-    var moves_input = document.getElementById("moves_input")
+  function onDrop(source, target) {
+    var move = game.move({
+      from: source,
+      to: target,
+      promotion: 'q'
+    });
 
-    function onDragStart(source, piece) {
-      if (game.game_over() === true ||
-          (game.turn() === 'w' && piece.search(/^b/) !== -1) ||
-          (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
-        return false;
-      }
-    }
+    if (move === null) return 'snapback';
+    updateStatus();
+  }
 
-    function onDrop(source, target) {
-      var move = game.move({
-        from: source,
-        to: target,
-        promotion: 'q'
-      });
+  function onSnapEnd() {
+    board.position(game.fen());
+  }
 
-      if (move === null) return 'snapback';
-      updateStatus();
-    }
+  function updateStatus() {
+    moves_text.innerHTML = game.pgn();
+    moves_input.value = game.history({verbose: true}).map(
+      m => m.from + m.to + (m.promotion ? m.promotion : "")
+    );
+  }
 
-    function onSnapEnd() {
-      board.position(game.fen());
-    }
-
-    function updateStatus() {
-      moves_text.innerHTML = game.pgn();
-      moves_input.value = game.history({verbose: true}).map(
-        m => m.from + m.to + (m.promotion ? m.promotion : "")
-      );
-    }
-
-    function undo() {
-      game.undo();
-      board.position(game.fen());
-      updateStatus();
-    }
-
-    function reset_board() {
-      game.reset();
-      board.position(game.fen());
-      updateStatus();
-    }
-
-    var cfg = {
-      draggable: true,
-      position: 'start',
-      onDragStart: onDragStart,
-      onDrop: onDrop,
-      onSnapEnd: onSnapEnd
-    };
-    var board = ChessBoard('board', cfg);
-
+  function undo() {
+    game.undo();
     board.position(game.fen());
     updateStatus();
-    </script>
-      <label for="opening_name">Opening name:</label><input name="opening_name" required="required" maxlength="50" {% if opening.opening_name %}value="{{opening.opening_name}}"{% endif %}/><br/>
-    <input type="submit" value="{% if opening %}Modify{% else %}Add{% endif %}"/>
-    </fieldset>
-  </form>
+  }
+
+  function reset_board() {
+    game.reset();
+    board.position(game.fen());
+    updateStatus();
+  }
+
+  var cfg = {
+    draggable: true,
+    position: 'start',
+    onDragStart: onDragStart,
+    onDrop: onDrop,
+    onSnapEnd: onSnapEnd
+  };
+  var board = ChessBoard('board', cfg);
+
+  board.position(game.fen());
+  updateStatus();
+  </script>
+    <label for="opening_name">Opening name:</label><input name="opening_name" required="required" maxlength="50" {% if opening.opening_name %}value="{{opening.opening_name}}"{% endif %}/><br/>
+  <input type="submit" value="{% if opening %}Modify{% else %}Add{% endif %}"/>
+  </fieldset>
+</form>
 {% else %}
-  <p><a href="{% url 'chess:login' %}">You need to be logged in to create new objects</a></p>
+<p><a href="{% url 'chess:login' %}">You need to be logged in to create new objects</a></p>
 {% endif %}
-</section>
 {% endblock %}

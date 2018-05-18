@@ -3,24 +3,20 @@
 {% block title %}{{player}}{% endblock %}
 
 {% block content %}
-<nav> </nav>
+<h1>{{player}}</h1>
 
-<section>
-  <h1>{{player}}</h1>
-  
-  {% if player.elo_rating %}(Elo: {{player.elo_rating}}){% endif %}
-  {% if player.nationality %}, {{player.nationality}}{% endif %}
+{% if player.elo_rating %}(Elo: {{player.elo_rating}}){% endif %}
+{% if player.nationality %}, {{player.nationality}}{% endif %}
 
-  <h3>Games list</h3>
-  {% with game_list=player_games %}
-  {% include "chs/game_table.html" %}
-  {% endwith %}
-  <a href="{% url 'chess:game_list' %}?player={{player.lastname|urlencode}}">all games</a>
+<h3>Games list</h3>
+{% with game_list=player_games %}
+{% include "chs/game_table.html" %}
+{% endwith %}
+<a href="{% url 'chess:game_list' %}?player={{player.lastname|urlencode}}">all games</a>
 
-  {% include "chs/comments.html" %}
-  {% if can_edit %}
-  <a href="{% url 'chess:player_edit' player.object_id %}">edit</a>
-  <a href="{% url 'chess:player_delete' player.object_id %}">delete</a>
-  {% endif %}
-</section>
+{% include "chs/comments.html" %}
+{% if can_edit %}
+<a href="{% url 'chess:player_edit' player.object_id %}">edit</a>
+<a href="{% url 'chess:player_delete' player.object_id %}">delete</a>
+{% endif %}
 {% endblock %}

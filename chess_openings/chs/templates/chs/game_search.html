@@ -12,10 +12,7 @@
 {% endblock %}
 
 {% block content %}
-<nav> </nav>
-
-<section>
-  <h1>Game Search</h1>
+<h1>Game Search</h1>
 <form action="{% url 'chess:game_list' %}" method="get">
   <fieldset> <legend>Game search</legend>
   <div id="chessboard">
@@ -110,5 +107,4 @@
   <input type="submit" value="Search"/>
   </fieldset>
 </form>
-</section>
 {% endblock %}
