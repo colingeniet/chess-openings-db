@@ -21,17 +21,19 @@ function validate_form() {
 }
 </script>
 <form id="register_form" action="{% url 'chess:handle_register' %}" method="post" onsubmit="return validate_form()">
-{% csrf_token %}
-  <label>Username</label><br/>
+  <fieldset> <legend>Account Registration</legend>
+  {% csrf_token %}
+  <label>Username:</label>
   <input type="text" name="account" required="required"/><br/>
-  <label>Password</label><br/>
+  <label>Password:</label>
   <input type="password" name="password" required="required"/><br/>
-  <label>Repeat password</label><br/>
+  <label>Repeat password:</label>
   <input type="password" name="password2" required="required"/><br/>
-  <input type="submit" value="Create account"/>
+  <input type="submit" value="Create account" style="width: 150px"/>
   {% if request.GET.next %}
   <input type="hidden" name="next" value="{{request.GET.next}}"/>
   {% endif %}
+  </fieldset>
 </form>
 </section>
 {% endblock %}
