@@ -5,10 +5,16 @@
 {% block title %}search players{% endblock %}
 
 {% block content %}
-<form action="{% url 'chess:player_list' %}" method="get">
-  Name:<input name="name"/><br/>
-  Elo min:<input type="number" name="elo_min"/> max:<input type="number" name="elo_max"/><br/>
-  Nationality:<input name="nationality"/>
-  <input type="submit" value="Search"/>
-</form>
+<nav> </nav>
+<section>
+  <form action="{% url 'chess:player_list' %}" method="get">
+    <fieldset> <legend> Player search : </legend>
+      <label for="name">Name:</label><input name="name"/><br/>
+      <label for="elo_min">Elo min:</label><input type="number" name="elo_min"/></br> 
+      <label for="elo_max@">Elo max:</label><input type="number" name="elo_max"/><br/>
+      <label for="nationality">Nationality:</label><input name="nationality"/>
+      <p><input type="submit" value="Search"/></p>
+    </fieldset>
+  </form>
+</section>
 {% endblock %}
