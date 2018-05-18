@@ -78,35 +78,9 @@ section {
     display: inline-block;
     margin : auto;
     padding: 1vw 1vh;
-    width: 78vw;
+    width: 97%;
     min-height: 76vh;
     border-left : 0.2vw rgb(187, 187, 187) ridge;
-}
-
-nav {
-    vertical-align: top;
-    width : 15vw;
-    height: 76vh;
-    display: inline-block;
-    margin : 0px;
-    padding : 1vw 1vh ;
-}
-
-nav li {
-    text-align: center;
-    font-size: 100%;
-    display : block;
-}
-
-nav a {
-    color : black;
-    display: block;
-    padding-top: 9px;
-    padding-bottom: 9px;
-}
-
-nav a:hover {
-    background: red;
 }
 
 h1 {
@@ -131,10 +105,12 @@ textarea {
     display:-ms-flexbox;
     display:flex;
     -ms-flex-wrap:wrap;
-flex-wrap:wrap}
+    flex-wrap:wrap;
+}
 
 .move-menu li {
-margin-bottom:-1px}
+    margin-bottom:-1px;
+}
 
 .move-menu li a {
     display:block;
