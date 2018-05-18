@@ -10,7 +10,7 @@
 <section>
 {% if request.session.account %}
 <form action="{% url 'chess:player_add' %}" method="post">
-  <fieldset><legend>Player {% if player %} modification {% else %} creation</legend>
+  <fieldset><legend>Player {% if player %} modification {% else %} creation {% endif %}</legend>
   {% csrf_token %}
   {% if player %}
   <input type="hidden" name="id" value="{{player.object_id}}"/>
