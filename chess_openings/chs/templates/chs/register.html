@@ -3,6 +3,8 @@
 {% block title %}register{% endblock %}
 
 {% block content %}
+<nav> </nav>
+<section>
 {% if error %}
 <p>Error : {{error}}</p>
 {% endif %}
@@ -31,4 +33,5 @@ function validate_form() {
   <input type="hidden" name="next" value="{{request.GET.next}}"/>
   {% endif %}
 </form>
+</section>
 {% endblock %}
