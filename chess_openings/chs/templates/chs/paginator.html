@@ -1,9 +1,7 @@
 {% load url_replace %}
 
 <div class="paginator">
-  <div class="outer-center">
-    <div class="product inner-center">
-    </div>
+  <div class="product inner-center">
   </div>
   {% if page_obj.has_previous %}
   <a href="?{% url_replace page=page_obj.previous_page_number %}">&lt;</a>
