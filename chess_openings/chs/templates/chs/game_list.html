@@ -3,6 +3,10 @@
 {% block title %}games{% endblock %}
 
 {% block content %}
+<nav></nav>
+
+<section>
+
 <script>active_navlink("nav_games");</script>
 <a href="{% url 'chess:game_search' %}">search</a>
 {% if request.session.account %}
@@ -50,4 +54,5 @@
 {% endfor %}
 </table>
 {% include "chs/paginator.html" %}
+</section>
 {% endblock %}
