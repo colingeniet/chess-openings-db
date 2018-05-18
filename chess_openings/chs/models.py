@@ -12,6 +12,7 @@ class Account(models.Model):
     """A website user account."""
     pseudo = models.CharField(max_length=20, unique=True, db_index=True)
     password = models.BinaryField(max_length=64)
+    salt = models.BinaryField(max_length=64)
     admin = models.BooleanField(default=False, db_index=True)
     can_edit = models.ManyToManyField('Object')
 

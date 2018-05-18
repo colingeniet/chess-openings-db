@@ -9,6 +9,7 @@ from . import pgn
 from . import models
 
 import hashlib
+import os
 
 
 def pagination_links(current, total):
@@ -678,7 +679,9 @@ def handle_login(request):
         })
     try:
         account = models.Account.objects.get(pseudo=request.POST['account'])
-        digest = hashlib.sha512(request.POST['password'].encode()).digest()
+        passwd = bytes(request.POST['password'].encode())
+        salt = account.salt
+        digest = hashlib.pbkdf2_hmac('sha256', passwd, salt, 100000)
         if(digest != bytes(account.password)):
             return render(request, 'chs/login.html', {
                 'error': "incorrect username or password"
@@ -725,9 +728,12 @@ def handle_register(request):
         return render(request, 'chs/register.html', {
             'error': "username already used"
         })
+    passwd = bytes(request.POST['password'].encode())
+    salt = os.urandom(64)
     account = models.Account(
         pseudo=request.POST['account'],
-        password=hashlib.sha512(request.POST['password'].encode()).digest()
+        password=hashlib.pbkdf2_hmac('sha256', passwd, salt, 100000),
+        salt=salt
     )
     account.save()
     request.session['account'] = account.id
