@@ -154,11 +154,13 @@
     return true;
   }
   </script>
+
   <form name="pgn_form" action="{% url 'chess:game_add_pgn' %}" method="post" onsubmit="return validate_pgn_form()">
-    {% csrf_token %}
-    Upload pgn file<br/>
-    <input type="file" name="pgn"/><br/>
-    <input type="submit" value="Add from pgn"/>
+    <fieldset> <legend>Upload PGN file</legend>
+      {% csrf_token %}
+      <input type="file" name="pgn"/><br/>
+      <input type="submit" value="Add from pgn" style="width: 150px"/>
+    </fieldset>
   </form>
 {% endif %}
 {% else %}
