@@ -3,13 +3,17 @@
 {% block title %}{{event.event_name}}{% endblock %}
 
 {% block content %}
-{{event}}
-<ul>
-{% for game in event_games %}
-  <li><a href="{% url 'chess:game' game.object_id %}">{{ game }}</a></li>
-{% endfor %}
-</ul>
-<a href="{% url 'chess:game_list' %}?event={{event.event_name|urlencode}}">all games</a>
+  <nav></nav>
 
-{% include "chs/comments.html" %}
+  <section>
+    <h1>{{event}}</h1>
+    <ul>
+      {% for game in event_games %}
+        <li><a href="{% url 'chess:game' game.object_id %}">{{ game }}</a></li>
+      {% endfor %}
+    </ul>
+    <a href="{% url 'chess:game_list' %}?event={{event.event_name|urlencode}}">all games</a>
+
+    {% include "chs/comments.html" %}
+  </section>
 {% endblock %}
