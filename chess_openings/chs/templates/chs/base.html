@@ -17,5 +17,8 @@
       {% block content %}
       {% endblock %}
     </div>
+    <footer>
+      <p>{% if request.session.account %}You are logged with {{ request.session.account|get_account }} {% endif %}</p>
+    </footer>
   </body>
 </html>
