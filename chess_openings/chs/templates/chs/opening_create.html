@@ -15,6 +15,7 @@
 <nav> </nav>
 
 <section>
+  <h1>Opening Creation</h1>
 {% if request.session.account %}
   <form action="{% url 'chess:opening_add' %}" method="post">
     <fieldset><legend>Opening creation</legend>
