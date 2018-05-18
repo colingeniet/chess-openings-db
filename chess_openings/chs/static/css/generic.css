@@ -216,7 +216,8 @@ input[type="submit"]:hover {
 
 .paginator {
     display: inline-block;
-    margin: 10px;
+    margin: auto;
+    max-width: 50%;
 }
 .paginator a {
     color: black;
