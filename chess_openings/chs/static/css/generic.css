@@ -216,15 +216,8 @@ input[type="submit"]:hover {
 
 
 .paginator {
-    float: right;
-    right: 50%;
-    position: relative;
-}
-
-.inner-center {
-    float: right;
-    right: -50%;
-    position: relative;
+    display:flex;
+    justify-content: center;
 }
 
 .paginator a {
