@@ -12,120 +12,126 @@
 {% endblock %}
 
 {% block content %}
-{% if request.session.account %}
-<form action="{% url 'chess:game_add' %}" method="post">
-  {% csrf_token %}
-  <div id="board" style="width: 400px"></div>
-  <p id="moves_text"></p>
-  <input type="hidden" id="moves_input" name="moves"/>
-  <input type="hidden" id="result_input" name="result" value="*"/>
-  <button type="button" onclick="undo()">Undo</button>
-  <button type="button" onclick="reset_board()">Reset</button>
-  <br/>
-  <script>
-  var game = new Chess();
-  var moves_text = document.getElementById("moves_text")
-  var moves_input = document.getElementById("moves_input")
-  var result_input = document.getElementById("result_input")
+<nav></nav>
 
-  function onDragStart(source, piece) {
-    if (game.game_over() === true ||
-        (game.turn() === 'w' && piece.search(/^b/) !== -1) ||
-        (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
-      return false;
-    }
-  }
+  <section>
+    {% if request.session.account %}
+    <h1> Game creation </h1>
+    <form action="{% url 'chess:game_add' %}" method="post">
+      {% csrf_token %}
+      <div id="board">
+        <p id="moves_text"></p>
+        <input type="hidden" id="moves_input" name="moves"/>
+        <input type="hidden" id="result_input" name="result" value="*"/>
+        <button type="button" onclick="undo()">Undo</button>
+        <button type="button" onclick="reset_board()">Reset</button>
+        <br/>
+        <script>
+        var game = new Chess();
+        var moves_text = document.getElementById("moves_text")
+        var moves_input = document.getElementById("moves_input")
+        var result_input = document.getElementById("result_input")
 
-  function onDrop(source, target) {
-    var move = game.move({
-      from: source,
-      to: target,
-      promotion: 'q'
-    });
-
-    if (move === null) return 'snapback';
-    updateStatus();
-  }
-
-  function onSnapEnd() {
-    board.position(game.fen());
-  }
-
-  function updateStatus() {
-    moves_text.innerHTML = game.pgn();
-    moves_input.value = game.history({verbose: true}).map(
-      m => m.from + m.to + (m.promotion ? m.promotion : "")
-    );
-    if(game.game_over()) {
-      if(game.in_checkmate()) {
-        if(game.turn() === 'b') {
-          result_input.value = "1-0";
-        } else {
-          result_input.value = "0-1";
+        function onDragStart(source, piece) {
+          if (game.game_over() === true ||
+              (game.turn() === 'w' && piece.search(/^b/) !== -1) ||
+              (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
+            return false;
+          }
         }
-      } else {
-        result_input.value = "1/2-1/2";
+
+        function onDrop(source, target) {
+          var move = game.move({
+            from: source,
+            to: target,
+            promotion: 'q'
+          });
+
+          if (move === null) return 'snapback';
+          updateStatus();
+        }
+
+        function onSnapEnd() {
+          board.position(game.fen());
+        }
+
+        function updateStatus() {
+          moves_text.innerHTML = game.pgn();
+          moves_input.value = game.history({verbose: true}).map(
+            m => m.from + m.to + (m.promotion ? m.promotion : "")
+          );
+          if(game.game_over()) {
+            if(game.in_checkmate()) {
+              if(game.turn() === 'b') {
+                result_input.value = "1-0";
+              } else {
+                result_input.value = "0-1";
+              }
+            } else {
+              result_input.value = "1/2-1/2";
+            }
+          } else {
+            result_input.value = "*";
+          }
+        }
+
+        function undo() {
+          game.undo();
+          board.position(game.fen());
+          updateStatus();
+        }
+
+        function reset_board() {
+          game.reset();
+          board.position(game.fen());
+          updateStatus();
+        }
+
+        var cfg = {
+          draggable: true,
+          position: 'start',
+          onDragStart: onDragStart,
+          onDrop: onDrop,
+          onSnapEnd: onSnapEnd
+        };
+        var board = ChessBoard('board', cfg);
+
+        updateStatus();
+        </script>
+
+      </div>
+      White <br/>
+      firstname:<input name="white_first" maxlength="50"/> lastname:<input name="white_last" maxlength="50"/><br/>
+      Black <br/>
+      firstname:<input name="black_first" maxlength="50"/> lastname:<input name="black_last" maxlength="50"/><br/>
+      Event <br/>
+      <input name="event" maxlength="60"/><br/>
+      Site <br/>
+      <input name="location" maxlength="60"/><br/>
+      Date <br/>
+      <input type="date" name="date"/><br/>
+      <input type="submit" value="Add"/>
+    </form>
+    <p>or</p>
+    <script>
+    var chess = new Chess();
+    function validate_pgn_form() {
+      var pgn = document.forms["pgn_form"]["pgn"].value;
+      if(!chess.load_pgn(pgn)) {
+        alert("Invalid pgn file");
+        return false;
       }
-    } else {
-      result_input.value = "*";
+      return true;
     }
-  }
-
-  function undo() {
-    game.undo();
-    board.position(game.fen());
-    updateStatus();
-  }
-
-  function reset_board() {
-    game.reset();
-    board.position(game.fen());
-    updateStatus();
-  }
-
-  var cfg = {
-    draggable: true,
-    position: 'start',
-    onDragStart: onDragStart,
-    onDrop: onDrop,
-    onSnapEnd: onSnapEnd
-  };
-  var board = ChessBoard('board', cfg);
-
-  updateStatus();
-  </script>
-
-  White <br/>
-  firstname:<input name="white_first" maxlength="50"/> lastname:<input name="white_last" maxlength="50"/><br/>
-  Black <br/>
-  firstname:<input name="black_first" maxlength="50"/> lastname:<input name="black_last" maxlength="50"/><br/>
-  Event <br/>
-  <input name="event" maxlength="60"/><br/>
-  Site <br/>
-  <input name="location" maxlength="60"/><br/>
-  Date <br/>
-  <input type="date" name="date"/><br/>
-  <input type="submit" value="Add"/>
-</form>
-<p>or</p>
-<script>
-var chess = new Chess();
-function validate_pgn_form() {
-  var pgn = document.forms["pgn_form"]["pgn"].value;
-  if(!chess.load_pgn(pgn)) {
-    alert("Invalid pgn file");
-    return false;
-  }
-  return true;
-}
-</script>
-<form name="pgn_form" action="{% url 'chess:game_add_pgn' %}" method="post" onsubmit="return validate_pgn_form()">
-  {% csrf_token %}
-  Upload pgn file<br/>
-  <input type="file" name="pgn"/><br/>
-  <input type="submit" value="Add"/>
-</form>
-{% else %}
-<p>You need to be logged in to create new objects</p>
-{% endif %}
+    </script>
+    <form name="pgn_form" action="{% url 'chess:game_add_pgn' %}" method="post" onsubmit="return validate_pgn_form()">
+      {% csrf_token %}
+      Upload pgn file<br/>
+      <input type="file" name="pgn"/><br/>
+      <input type="submit" value="Add"/>
+    </form>
+    {% else %}
+    <p>You need to be logged in to create new objects</p>
+    {% endif %}
+  </section>
 {% endblock %}
