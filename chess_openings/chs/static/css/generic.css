@@ -189,7 +189,7 @@ legend {
     font-weight:bold;
 }
 
-input, textarea {
+input, textarea, select {
     min-width: 100px;
     width: 20%;
     height: 25px;
@@ -197,6 +197,10 @@ input, textarea {
     border-radius:5px;
     font-size: 1.7vmin;
     /*box-shadow:1px 1px 2px #C0C0C0 inset; */
+}
+
+select {    
+    height: 30px;
 }
 
 textarea {
@@ -227,6 +231,8 @@ input[type=file] {
 
 input[type=date] {
   width: 150px;
+  max-width: 20%;
+  min-width: 10%;
 }
 
 input[type="submit"]:hover {
