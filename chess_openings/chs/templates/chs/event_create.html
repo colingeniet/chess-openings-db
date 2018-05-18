@@ -5,15 +5,19 @@
 {% block title %}create event{% endblock %}
 
 {% block content %}
-{% if request.session.account %}
-<form action="{% url 'chess:event_add' %}" method="post">
-  {% csrf_token %}
-  Name:<input name="event_name" required="required" maxlength="60"/><br/>
-  Location:<input name="location" maxlength="60"/><br/>
-  Starts:<input type="date" name="start_date"/> Ends:<input type="date" name="end_date"/><br/>
-  <input type="submit" value="Add"/>
-</form>
-{% else %}
-<p>You need to be logged in to create new objects</p>
-{% endif %}
+  <nav></nav>
+
+  <section>
+    {% if request.session.account %}
+      <form action="{% url 'chess:event_add' %}" method="post">
+        {% csrf_token %}
+        Name:<input name="event_name" required="required" maxlength="60"/><br/>
+        Location:<input name="location" maxlength="60"/><br/>
+        Starts:<input type="date" name="start_date"/> Ends:<input type="date" name="end_date"/><br/>
+        <input type="submit" value="Add"/>
+      </form>
+    {% else %}
+      <p>You need to be logged in to create new objects</p>
+    {% endif %}
+  </section>
 {% endblock %}
