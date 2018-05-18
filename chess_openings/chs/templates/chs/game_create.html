@@ -22,20 +22,16 @@
     {% if game %}
     <input type="hidden" name="id" value="{{game.object_id}}"/>
     {% endif %}
-    <div id="board">
-      <p id="moves_text"></p>
-      <input type="hidden" id="moves_input" name="moves"/>
-      <button type="button" onclick="undo()">Undo</button>
-      <button type="button" onclick="reset_board()">Reset</button></br>
-      Result:
-      <select id="result_input" name="result">
-        <option value="1-0">White wins (1-0)</option>
-        <option value="0-1">Black wins (0-1)</option>
-        <option value="1/2-1/2">Draw (1/2-1/2)</option>
-        <option value="*" selected>Ongoing - Other (*)</option>
-      </select></br>
-      <br/>
-      <script>
+    <div id="chessboard">
+      <div id="board"></div>
+      <input type="hidden" id="moves_input" name="moves"/>      
+      <ul class="move-menu">
+        <li class="prev"><button type="button" onclick="undo()">Undo</button></li>
+        <li class="next"><button type="button" onclick="reset_board()">Reset</button></br></li>
+      </ul>
+    </div>
+    <p id="moves_text"></p>
+    <script>
       {% if game.moves %}
       var moves = [
         {% for move in game.moves_san %}"{{move}}",{% endfor %}
@@ -133,8 +129,13 @@
       result_input.value = "{{game.result}}";
       {% endif %}
       </script>
-    </div>
 
+    <label for="result">Result:</label><select id="result_input" name="result">
+        <option value="1-0">White wins (1-0)</option>
+        <option value="0-1">Black wins (0-1)</option>
+        <option value="1/2-1/2">Draw (1/2-1/2)</option>
+        <option value="*" selected>Ongoing - Other (*)</option>
+    </select>
     <label for="white_first">White firstname:</label><input name="white_first" maxlength="50" {% if game.white %}value="{{game.white.firstname}}"{% endif %}/>
     <label for="white_last">White lastname:</label><input name="white_last" maxlength="50" {% if game.white %}value="{{game.white.lastname}}"{% endif %}/><br/>
     <label for="black_first">Black firstname:</label><input name="black_first" maxlength="50" {% if game.black %}value="{{game.black.firstname}}"{% endif %}/>
