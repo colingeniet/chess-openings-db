@@ -14,9 +14,10 @@
 
     <div id = "content">
       <div id = "sub-header"> </div>
-
-      {% block content %}
-      {% endblock %}
+      <section>
+        {% block content %}
+        {% endblock %}
+      </section>
     </div>
     <footer>
       <p>{% if request.session.account %}You are logged as {{ request.session.account|get_account }} {% endif %}</p>
