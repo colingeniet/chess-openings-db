@@ -215,8 +215,19 @@ input[type="submit"]:hover {
 }
 
 .paginator {
+    display: inline-block;
+    margin: auto;
+}
+
+.outer-center {
     float: right;
     right: 50%;
+    position: relative;
+}
+
+.inner-center {
+    float: right;
+    right: -50%;
     position: relative;
 }
 
