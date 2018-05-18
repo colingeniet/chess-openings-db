@@ -8,13 +8,14 @@
 <nav> </nav>
 
 <section>
-<form action="{% url 'chess:opening_list' %}" method="get">
-  <fieldset> <legend>Opening Search</legend>
-    <label for="name">Name:</label><input name="name"/><br/>
-    <label for="variation_of">Variation of:</label><input name="variation_of"/><br/>
-    <label for="has_variation">Has variation:</label><input name="has_variation"/><br/>
-    <input type="submit" value="Search"/>
-  </fieldset>
-</form>
+  <h1>Opening Search</h1>
+  <form action="{% url 'chess:opening_list' %}" method="get">
+    <fieldset> <legend>Opening Search</legend>
+      <label for="name">Name:</label><input name="name"/><br/>
+      <label for="variation_of">Variation of:</label><input name="variation_of"/><br/>
+      <label for="has_variation">Has variation:</label><input name="has_variation"/><br/>
+      <input type="submit" value="Search"/>
+    </fieldset>
+  </form>
 </section>
 {% endblock %}
