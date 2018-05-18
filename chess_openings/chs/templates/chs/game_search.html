@@ -17,9 +17,15 @@
 <section>
 <form action="{% url 'chess:game_list' %}" method="get">
   <fieldset> <legend>Game search</legend>
-  <div id="board" style="width: 400px">
+  <div id="chessboard">
+    <div id="board"></div>
+    <input type="hidden" id="moves_input" name="moves"/>
+    <ul class="move-menu">
+      <li class="prev"> <button type="button" onclick="undo();">Undo</button> </li>
+      <li class="next"><button type="button" onclick="reset_board()">Reset</button> </li>
+    </ul>
+  </div>
   <p id="moves_text"></p>
-  <input type="hidden" id="moves_input" name="moves"/>
   <script>
   var game = new Chess();
   var moves_text = document.getElementById("moves_text")
@@ -78,11 +84,6 @@
 
   updateStatus();
   </script>
-  <ul class="move-menu">
-    <li class="prev"> <button type="button" onclick="undo();">Undo</button> </li>
-    <li class="next"><button type="button" onclick="reset_board()">Reset</button> </li>
-</ul>
-</div>
 
   <label for="player">Player name:</label><input name="player"/> 
   <label for="player_nat">nationality:</label><input name="player_nat"/><br/>
