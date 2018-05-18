@@ -3,6 +3,8 @@
 {% block title %}login{% endblock %}
 
 {% block content %}
+<nav> </nav>
+<section>
 {% if error %}
 <p>Error : {{error}}</p>
 {% endif %}
@@ -14,4 +16,5 @@
   <input type="password" name="password" required="required"/><br/>
   <input type="submit" value="Login"/>
 </form>
+</section>
 {% endblock %}
