@@ -3,6 +3,9 @@
 {% block title %}openings{% endblock %}
 
 {% block content %}
+<nav> </nav>
+
+<section>
 <script>active_navlink("nav_openings");</script>
 <a href="{% url 'chess:opening_search' %}">search</a>
 {% if request.session.account %}
@@ -22,4 +25,5 @@
 {% endfor %}
 </table>
 {% include "chs/paginator.html" %}
+</section>
 {% endblock %}
