@@ -17,16 +17,18 @@
 <section>
 {% if request.session.account %}
 <form action="{% url 'chess:opening_add' %}" method="post">
+  <fieldset><legend>Opening creation</legend>
   {% csrf_token %}
   {% if opening %}
   <input type="hidden" name="id" value="{{opening.object_id}}"/>
   {% endif %}
-  <div id="board" style="width: 400px"></div>
+  <div id="chessboard">
+    <div id="board"></div>
+    <input type="hidden" id="moves_input" name="moves"/>
+    <button type="button" onclick="undo()">Undo</button>
+    <button type="button" onclick="reset_board()">Reset</button>
+  </div>
   <p id="moves_text"></p>
-  <input type="hidden" id="moves_input" name="moves"/>
-  <button type="button" onclick="undo()">Undo</button>
-  <button type="button" onclick="reset_board()">Reset</button>
-  <br/>
   <script>
   {% if opening.moves %}
   var moves = [
@@ -100,11 +102,12 @@
   board.position(game.fen());
   updateStatus();
   </script>
-  Opening name:<input name="opening_name" required="required" maxlength="50" {% if opening.opening_name %}value="{{opening.opening_name}}"{% endif %}/><br/>
+    <label for="opening_name">Opening name:</label><input name="opening_name" required="required" maxlength="50" {% if opening.opening_name %}value="{{opening.opening_name}}"{% endif %}/><br/>
   <input type="submit" value="{% if opening %}Modify{% else %}Add{% endif %}"/>
+  </fieldset>
 </form>
 {% else %}
-<p>You need to be logged in to create new objects</p>
+  <p><a href="{% url 'chess:login' %}">You need to be logged in to create new objects</a></p>
 {% endif %}
 </section>
 {% endblock %}
