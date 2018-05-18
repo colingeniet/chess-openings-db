@@ -8,13 +8,9 @@
 <section>
   <h1>{{event.event_name}}</h1>
   
-  <h2>From 
-    {% if event.start_date %} {{event.start_date}} {% endif %}
-    to
-    {% if event.end_date %} {{event.end_date}} {% endif %} 
-    -
-    {% if event.location %} {{event.location}} {% endif %}
-  </h2>
+  From {% if event.start_date %} {{event.start_date}} {% endif %}
+  to {% if event.end_date %} {{event.end_date}} {% endif %} -
+  {% if event.location %} {{event.location}} {% endif %}
   
   {% with game_list=event_games %}
     {% include "chs/game_table.html" %}
