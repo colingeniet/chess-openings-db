@@ -1,3 +1,5 @@
+{% load get_account %}
+
 <header>
   <script>
   function active_navlink(class_name) {
@@ -22,21 +24,23 @@
   </div>
 
   <div id="header-login">
+  {% if request.session.account %}
     <div id="header-elt">
-
-      {% if request.session.account %}
-        <a href ="#"><h3>{{request.session.account.pseudo}}</h3></a>
-        <a href="{% url 'chess:logout' %}?next={% firstof request.path '/' %}"><h3>logout</h3></a>
-      {% else %}
-        <a href="{% url 'chess:login' %}?next={% firstof request.path '/' %}"><h3>login</h3></a>
-      {% endif %}
-
+      <a href ="#"><h3>{{ request.session.account|get_account }}</h3></a>
     </div>
+    <div id="header-elt">
+      <a href="{% url 'chess:logout' %}?next={% firstof request.path '/' %}"><h3>logout</h3></a>
+    </div>
+  {% else %}
+    <div id="header-elt">
+      <a href="{% url 'chess:login' %}?next={% firstof request.path '/' %}"><h3>login</h3></a>
+    </div>
+  {% endif %}
 
-    {% if not request.session.account %}
-      <div id="header-elt">
-        <a href="{% url 'chess:register' %}?next={% firstof request.path '/' %}"><h3>create account</h3></a>
-      </div>
-    {% endif %}
+  {% if not request.session.account %}
+    <div id="header-elt">
+      <a href="{% url 'chess:register' %}?next={% firstof request.path '/' %}"><h3>create account</h3></a>
+    </div>
+  {% endif %}
   </div>
 </header>
