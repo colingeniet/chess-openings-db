@@ -104,7 +104,7 @@ nav a:hover {
 }
 
 h1 {
-    text-shadow : 3px 3px 3px green;
+    text-shadow : 3px 3px 3px red;
 }
 
 textarea {
@@ -129,7 +129,7 @@ flex-wrap:wrap}
 .move-menu li {
 margin-bottom:-1px}
 
-.move-menu li button {
+.move-menu li a {
     display:block;
     text-align:center;
     text-decoration:none;
@@ -141,16 +141,7 @@ margin-bottom:-1px}
     transition:all .15s ease;
 }
 
-button {
-    border: none;
-    cursor: pointer;
-}
-
-.move-menu li button:focus,.move-menu li button:hover {
-    background:#d2d5d6;
-}
-
-.move-menu li.next button,.move-menu li.prev button,.move-menu li.reset button {
+.move-menu li.next a,.move-menu li.prev a,.move-menu li.reset a {
     padding:0 15px;
 }
 
@@ -168,7 +159,7 @@ button {
 }
 
 .move-menu li.reset {
-    margin-left: 70px;
+    margin-left: 72px;
 }
 
 form {
