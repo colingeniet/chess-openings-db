@@ -1,24 +1,42 @@
-<div class="login">
-  {% if request.session.account %}
-  <span>{{request.session.account.pseudo}}</span>
-  <a href="{% url 'chess:logout' %}">logout</a>
-  {% else %}
-  <a href="{% url 'chess:login' %}">login</a>
-  <a href="{% url 'chess:register' %}">create account</a>
-  {% endif %}
-</div>
-<br/>
-<script>
-  function active_navlink(class_name) {
-  elts = document.getElementsByClassName(class_name)
-  for (i=0; i<elts.length; i++) {
-    elts[i].className += " active";
+<header>
+  <script>
+    function active_navlink(class_name) {
+    elts = document.getElementsByClassName(class_name)
+    for (i=0; i<elts.length; i++) {
+      elts[i].className += " active";
+    }
   }
-}
-</script>
-<div class="nav">
-  <a href="{% url 'chess:game_list'%}" class="nav_games">games</a>
-  <a href="{% url 'chess:player_list'%}" class="nav_players">players</a>
-  <a href="{% url 'chess:event_list'%}" class="nav_events">events</a>
-  <a href="{% url 'chess:opening_list'%}" class="nav_openings">openings</a>
-</div>
+  </script>
+
+  <div id ="header-elt">
+   <a href="{% url 'chess:game_list'%}" class="nav_games"><h3> games </h3></a>
+  </div>
+  <div id ="header-elt">
+    <a href="{% url 'chess:player_list'%}" class="nav_players"><h3>players</h3></a>
+  </div>
+  <div id ="header-elt">
+    <a href="{% url 'chess:event_list'%}" class="nav_events"><h3>events</h3></a>
+  </div>
+  <div id ="header-elt">
+    <a href="{% url 'chess:opening_list'%}" class="nav_openings"><h3>openings</h3></a>
+  </div>
+  
+  <div id="header-login">
+    <div id="header-elt">
+      
+      {% if request.session.account %}
+        <a href ="#"><h3>{{request.session.account.pseudo}}</h3></a>
+        <a href="{% url 'chess:logout' %}"><h3>logout</h3></a>
+      {% else %}
+        <a href="{% url 'chess:login' %}"><h3>login</h3></a>
+      {% endif %}
+      
+    </div>
+    
+    {% if not request.session.account %}
+      <div id="header-elt">
+        <a href="{% url 'chess:register' %}"><h3>create account</h3></a>
+      </div>
+    {% endif %}
+  </div>
+</header>
