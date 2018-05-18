@@ -10,10 +10,13 @@
   <section>
     <h1>Event search </h1>
     <form action="{% url 'chess:event_list' %}" method="get">
-      Name:<input name="name"/><br/>
-      Location:<input name="location"/><br/>
-      After:<input type="date" name="after"/> Before:<input type="date" name="before"/><br/>
-      <input type="submit" value="Search"/>
+      <fieldset> <legend> Event search</legend>
+        <label for="name">Name:</label><input name="name"/><br/>
+        <label for="location">Location:</label><input name="location"/><br/>
+        <label for="after">After:</label><input type="date" name="after"/> 
+        <label for="before">Before:</label><input type="date" name="before"/><br/>
+        <input type="submit" value="Search"/>
+      </fieldset>
     </form>
   </section>
 {% endblock %}
