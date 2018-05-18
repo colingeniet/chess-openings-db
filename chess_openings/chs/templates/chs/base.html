@@ -5,12 +5,17 @@
     <title>chess database - {% block title %}home{% endblock %}</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="{% static "css/generic.css"%}"/>
-{% block head %}
-{% endblock %}
+    {% block head %}
+    {% endblock %}
   </head>
   <body>
-{% include "chs/navigation.html" %}
-{% block content %}
-{% endblock %}
+    {% include "chs/navigation.html" %}
+
+    <div id = "content">
+      <div id = "sub-header"> </div>
+  
+      {% block content %}
+      {% endblock %}
+    </div>
   </body>
 </html>
