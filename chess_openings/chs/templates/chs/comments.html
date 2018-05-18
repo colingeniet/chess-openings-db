@@ -1,15 +1,16 @@
 <h2> Comments </h1>
 {% for comment in object.object.comments %}
-  <h6>{{comment.account.pseudo}}</h6>
-  <p>{{comment.text}}</p>
+<h4>{{comment.account.pseudo}}</h4>
+<span>{{comment.time}}</span>
+<p>{{comment.text}}</p>
 {% endfor %}
 
 {% if request.session.account %}
-  <form action="{% url 'chess:comment' object.object.id %}" method="post">
-    {% csrf_token %}
-    <textarea rows="5" cols="100" maxlength="300" name="comment_text"></textarea><br/>
-    <input type="submit" value="Post comment" style="width: 150px"/>
-  </form>
+<form action="{% url 'chess:comment' object.object.id %}" method="post">
+  {% csrf_token %}
+  <textarea rows="5" cols="100" maxlength="300" name="comment_text"></textarea><br/>
+  <input type="submit" value="Post comment" style="width: 150px"/>
+</form>
 {% else %}
-  <p><a href="{% url 'chess:login' %}">You need to be logged in to post comments.</a></p>
+<p><a href="{% url 'chess:login' %}">You need to be logged in to post comments.</a></p>
 {% endif %}
