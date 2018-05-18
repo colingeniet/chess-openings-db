@@ -6,12 +6,13 @@
   <nav></nav>
 
   <section>
-    <h1> Events list </h1>
+    <h1>Events list</h1>
     <script>active_navlink("nav_events");</script>
-    <a href="{% url 'chess:event_search' %}">search</a>
+    You can also <a href="{% url 'chess:event_search' %}">search</a>
     {% if request.session.account %}
-      <a href="{% url 'chess:event_create' %}">create</a>
+      or <a href="{% url 'chess:event_create' %}">create</a>
     {% endif %}
+    events.
     {% include "chs/paginator.html" %}
     <table>
       <tr>
