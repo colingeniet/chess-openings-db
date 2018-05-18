@@ -12,9 +12,17 @@
 {% endblock %}
 
 {% block content %}
+{% if game.white %}
 <a href="{% url 'chess:player' game.white.object_id %}"> {{game.white}} </a>
+{% else %}
+unknown
+{% endif %}
 vs
+{% if game.black %}
 <a href="{% url 'chess:player' game.black.object_id %}"> {{game.black}} </a>
+{% else %}
+unknown
+{% endif %}
 : {{game.result}}
 <br/>
 {% if game.event %}
@@ -96,4 +104,8 @@ set_moves_text();
 </ul>
 
 {% include "chs/comments.html" %}
+{% if can_edit %}
+<a href="{% url 'chess:game_edit' game.object_id %}">edit</a>
+<a href="{% url 'chess:game_delete' game.object_id %}">delete</a>
+{% endif %}
 {% endblock %}

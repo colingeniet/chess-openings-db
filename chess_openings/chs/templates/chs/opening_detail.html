@@ -80,6 +80,7 @@ set_moves_text();
   <li><a href="{% url 'chess:game' game.object_id %}">{{ game }}</a></li>
 {% endfor %}
 </ul>
+<a href="{% url 'chess:game_list' %}?opening={{opening.opening_name|urlencode}}">all games</a>
 <h3>Variations</h3>
 <ul>
 {% for opening in variations %}
@@ -94,4 +95,8 @@ set_moves_text();
 </ul>
 
 {% include "chs/comments.html" %}
+{% if can_edit %}
+<a href="{% url 'chess:opening_edit' opening.object_id %}">edit</a>
+<a href="{% url 'chess:opening_delete' opening.object_id %}">delete</a>
+{% endif %}
 {% endblock %}

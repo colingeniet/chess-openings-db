@@ -13,5 +13,8 @@
   <label>Password</label><br/>
   <input type="password" name="password" required="required"/><br/>
   <input type="submit" value="Login"/>
+  {% if request.GET.next %}
+  <input type="hidden" name="next" value="{{request.GET.next}}"/>
+  {% endif %}
 </form>
 {% endblock %}

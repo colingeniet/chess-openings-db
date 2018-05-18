@@ -15,15 +15,37 @@
 {% if request.session.account %}
 <form action="{% url 'chess:game_add' %}" method="post">
   {% csrf_token %}
+  {% if game %}
+  <input type="hidden" name="id" value="{{game.object_id}}"/>
+  {% endif %}
   <div id="board" style="width: 400px"></div>
   <p id="moves_text"></p>
   <input type="hidden" id="moves_input" name="moves"/>
-  <input type="hidden" id="result_input" name="result" value="*"/>
   <button type="button" onclick="undo()">Undo</button>
-  <button type="button" onclick="reset_board()">Reset</button>
+  <button type="button" onclick="reset_board()">Reset</button></br>
+  Result:
+  <select id="result_input" name="result">
+    <option value="1-0">White wins (1-0)</option>
+    <option value="0-1">Black wins (0-1)</option>
+    <option value="1/2-1/2">Draw (1/2-1/2)</option>
+    <option value="*" selected>Ongoing - Other (*)</option>
+  </select></br>
   <br/>
   <script>
+  {% if game.moves %}
+  var moves = [
+    {% for move in game.moves_san %}"{{move}}",{% endfor %}
+  ];
+  {% else %}
+  var moves = [];
+  {% endif %}
+  var moves_len = moves.length;
+
   var game = new Chess();
+  for (i = 0; i < moves_len; i++) {
+    game.move(moves[i]);
+  }
+
   var moves_text = document.getElementById("moves_text")
   var moves_input = document.getElementById("moves_input")
   var result_input = document.getElementById("result_input")
@@ -56,19 +78,28 @@
     moves_input.value = game.history({verbose: true}).map(
       m => m.from + m.to + (m.promotion ? m.promotion : "")
     );
+
+    var value = "*";
+    var force = false;
     if(game.game_over()) {
+      force = true;
       if(game.in_checkmate()) {
         if(game.turn() === 'b') {
-          result_input.value = "1-0";
+          value = "1-0";
         } else {
-          result_input.value = "0-1";
+          value = "0-1";
         }
       } else {
-        result_input.value = "1/2-1/2";
+        value = "1/2-1/2";
       }
-    } else {
-      result_input.value = "*";
     }
+
+    for (i = 0; i < result_input.options.length; i++) {
+      option = result_input.options[i];
+      if(force && option.value !== value) option.disabled = true;
+      else option.disabled = false;
+    }
+    result_input.value = value;
   }
 
   function undo() {
@@ -92,21 +123,28 @@
   };
   var board = ChessBoard('board', cfg);
 
+  board.position(game.fen());
   updateStatus();
+  {% if game.result %}
+  result_input.value = "{{game.result}}";
+  {% endif %}
   </script>
 
   White <br/>
-  firstname:<input name="white_first" maxlength="50"/> lastname:<input name="white_last" maxlength="50"/><br/>
+  firstname:<input name="white_first" maxlength="50" {% if game.white %}value="{{game.white.firstname}}"{% endif %}/>
+  lastname:<input name="white_last" maxlength="50" {% if game.white %}value="{{game.white.lastname}}"{% endif %}/><br/>
   Black <br/>
-  firstname:<input name="black_first" maxlength="50"/> lastname:<input name="black_last" maxlength="50"/><br/>
+  firstname:<input name="black_first" maxlength="50" {% if game.black %}value="{{game.black.firstname}}"{% endif %}/>
+  lastname:<input name="black_last" maxlength="50" {% if game.black %}value="{{game.black.lastname}}"{% endif %}/><br/>
   Event <br/>
-  <input name="event" maxlength="60"/><br/>
+  <input name="event" maxlength="60"  {% if game.event %}value="{{game.event.event_name}}"{% endif %}/><br/>
   Site <br/>
-  <input name="location" maxlength="60"/><br/>
+  <input name="location" maxlength="60" {% if game.location %}value="{{game.location}}"{% endif %}/><br/>
   Date <br/>
-  <input type="date" name="date"/><br/>
-  <input type="submit" value="Add"/>
+  <input type="date" name="date" {% if game.start_date %}value="{{game.start_date.isoformat}}"{% endif %}/><br/>
+  <input type="submit" value="{% if game %}Modify{% else %}Add{% endif %}"/>
 </form>
+{% if not game %}
 <p>or</p>
 <script>
 var chess = new Chess();
@@ -123,8 +161,9 @@ function validate_pgn_form() {
   {% csrf_token %}
   Upload pgn file<br/>
   <input type="file" name="pgn"/><br/>
-  <input type="submit" value="Add"/>
+  <input type="submit" value="Add from pgn"/>
 </form>
+{% endif %}
 {% else %}
 <p>You need to be logged in to create new objects</p>
 {% endif %}

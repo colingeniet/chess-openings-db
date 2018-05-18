@@ -12,10 +12,20 @@ class Account(models.Model):
     """A website user account."""
     pseudo = models.CharField(max_length=20, unique=True, db_index=True)
     password = models.BinaryField(max_length=64)
+    admin = models.BooleanField(default=False, db_index=True)
     can_edit = models.ManyToManyField('Object')
 
     def __str__(self):
         return self.pseudo
+
+    def has_edit_rights(self, obj):
+        id = obj.object_id
+        obj = Object.objects.get(pk=id)
+        return self.admin or obj.owner == self or self.can_edit.filter(id=id).exists()
+
+
+def has_edit_rights(account_pk, obj):
+    return Account.objects.get(pk=account_pk).has_edit_rights(obj)
 
 
 class Object(models.Model):
@@ -24,6 +34,17 @@ class Object(models.Model):
 
     def comments(self):
         return Comment.objects.filter(object=self).order_by('time')
+
+    def delete(self):
+        self.account_set.clear()
+        return super(Object, self).delete()
+
+
+def create_obj(account):
+    obj = Object(owner=account)
+    obj.save()
+    account.can_edit.add(obj)
+    return obj
 
 
 class Comment(models.Model):
@@ -50,6 +71,10 @@ class Player(models.Model):
 
     def games(self):
         return Game.objects.filter(Q(white=self) | Q(black=self))
+
+    def delete(self):
+        obj = self.object
+        return super(Player, self).delete() + obj.delete()
 
 
 def find_player(firstname, lastname):
@@ -84,8 +109,8 @@ class Event(models.Model):
 
     def __str__(self):
         location_str = ", " + self.location if self.location else ""
-        start_date_str = ", " + self.start_date if self.start_date else ""
-        end_date_str = " -- " + self.end_date if self.end_date else ""
+        start_date_str = ", " + str(self.start_date) if self.start_date else ""
+        end_date_str = " -- " + str(self.end_date) if self.end_date else ""
         return self.event_name + location_str + start_date_str + end_date_str
 
     def name(self):
@@ -93,6 +118,10 @@ class Event(models.Model):
 
     def games(self):
         return Game.objects.filter(event=self)
+
+    def delete(self):
+        obj = self.object
+        return super(Event, self).delete() + obj.delete()
 
 
 def find_or_add_event(name, owner):
@@ -151,6 +180,10 @@ class Game(models.Model):
     def openings(self):
         return Opening.objects.filter(moves__chs_startof=self.moves)
 
+    def delete(self):
+        obj = self.object
+        return super(Game, self).delete() + obj.delete()
+
 
 class Opening(models.Model):
     """A chess opening record."""
@@ -177,3 +210,7 @@ class Opening(models.Model):
         return Opening.objects.filter(
                 moves__chs_startof=self.moves
             ).exclude(object_id=self.object_id)
+
+    def delete(self):
+        obj = self.object
+        return super(Opening, self).delete() + obj.delete()

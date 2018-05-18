@@ -12,4 +12,8 @@
 <a href="{% url 'chess:game_list' %}?event={{event.event_name|urlencode}}">all games</a>
 
 {% include "chs/comments.html" %}
+{% if can_edit %}
+<a href="{% url 'chess:event_edit' event.object_id %}">edit</a>
+<a href="{% url 'chess:event_delete' event.object_id %}">delete</a>
+{% endif %}
 {% endblock %}

@@ -6,7 +6,19 @@
 {% if error %}
 <p>Error : {{error}}</p>
 {% endif %}
-<form action="{% url 'chess:handle_register' %}" method="post">
+<script>
+function validate_form() {
+  var form = document.forms["register_form"];
+  if(form["password"].value !== form["password2"].value) {
+    alert("Passwords do not match");
+    return false;
+  } else {
+    form["password2"].disable = true;
+    return true;
+  }
+}
+</script>
+<form id="register_form" action="{% url 'chess:handle_register' %}" method="post" onsubmit="return validate_form()">
 {% csrf_token %}
   <label>Username</label><br/>
   <input type="text" name="account" required="required"/><br/>
@@ -15,5 +27,8 @@
   <label>Repeat password</label><br/>
   <input type="password" name="password2" required="required"/><br/>
   <input type="submit" value="Create account"/>
+  {% if request.GET.next %}
+  <input type="hidden" name="next" value="{{request.GET.next}}"/>
+  {% endif %}
 </form>
 {% endblock %}

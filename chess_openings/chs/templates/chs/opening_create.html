@@ -15,6 +15,9 @@
 {% if request.session.account %}
 <form action="{% url 'chess:opening_add' %}" method="post">
   {% csrf_token %}
+  {% if opening %}
+  <input type="hidden" name="id" value="{{opening.object_id}}"/>
+  {% endif %}
   <div id="board" style="width: 400px"></div>
   <p id="moves_text"></p>
   <input type="hidden" id="moves_input" name="moves"/>
@@ -22,7 +25,20 @@
   <button type="button" onclick="reset_board()">Reset</button>
   <br/>
   <script>
+  {% if opening.moves %}
+  var moves = [
+    {% for move in opening.moves_san %}"{{move}}",{% endfor %}
+  ];
+  {% else %}
+  var moves = [];
+  {% endif %}
+  var moves_len = moves.length;
+
   var game = new Chess();
+  for (i = 0; i < moves_len; i++) {
+    game.move(moves[i]);
+  }
+
   var moves_text = document.getElementById("moves_text")
   var moves_input = document.getElementById("moves_input")
   var result_input = document.getElementById("result_input")
@@ -78,10 +94,11 @@
   };
   var board = ChessBoard('board', cfg);
 
+  board.position(game.fen());
   updateStatus();
   </script>
-  Opening name:<input name="opening_name" required="required" maxlength="50"/><br/>
-  <input type="submit" value="Add"/>
+  Opening name:<input name="opening_name" required="required" maxlength="50" {% if opening.opening_name %}value="{{opening.opening_name}}"{% endif %}/><br/>
+  <input type="submit" value="{% if opening %}Modify{% else %}Add{% endif %}"/>
 </form>
 {% else %}
 <p>You need to be logged in to create new objects</p>

@@ -3,6 +3,7 @@ from django.views import generic
 from django.db.models import Q
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, get_object_or_404
+from django.db.models.sql.constants import INNER, LOUTER
 from . import pgn
 
 from . import models
@@ -41,12 +42,18 @@ class PaginatedListView(generic.ListView):
         return context
 
 
+def can_edit(session, object):
+    return ('account' in session and session['account']
+            and models.has_edit_rights(session['account'], object))
+
+
 class GameDetail(generic.DetailView):
     model = models.Game
 
     def get_context_data(self, **kwargs):
         context = super(GameDetail, self).get_context_data(**kwargs)
-        context['openings'] = context['game'].openings()[:50]
+        context['openings'] = context['game'].openings()
+        context['can_edit'] = can_edit(self.request.session, context['game'])
         return context
 
 
@@ -56,6 +63,7 @@ class PlayerDetail(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super(PlayerDetail, self).get_context_data(**kwargs)
         context['player_games'] = context['player'].games()[:50]
+        context['can_edit'] = can_edit(self.request.session, context['player'])
         return context
 
 
@@ -65,6 +73,7 @@ class EventDetail(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super(EventDetail, self).get_context_data(**kwargs)
         context['event_games'] = context['event'].games()[:50]
+        context['can_edit'] = can_edit(self.request.session, context['event'])
         return context
 
 
@@ -73,10 +82,89 @@ class OpeningDetail(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(OpeningDetail, self).get_context_data(**kwargs)
-        context['opening_games'] = context['opening'].games()[:50]
-        context['variations'] = context['opening'].variations()[:50]
-        context['variation_of'] = context['opening'].variation_of()[:50]
+        opening = context['opening']
+        context['opening_games'] = opening.games()[:50]
+        context['variations'] = opening.variations()
+        context['variation_of'] = opening.variation_of()
+        context['can_edit'] = can_edit(self.request.session, opening)
         return context
+
+
+# This is a big hack to get django to get django to do a weird join.
+# The problem is with queries like 'games where either player is ...'.
+# Such queries are best done with a single join :
+#   chs_game JOIN chs_player ON
+#   white_id = chs_player.object_id OR black_id = chs_player.object_id
+#
+# Unfortunaly, django is really not designed to do joins with strange
+# conditions, such as join conditions with an OR.
+# Equivalent queries that can easily be expressed through django are
+# heavily inefficient (~10 times slower during my tests).
+
+# This class is a hacked version of `django.db.models.sql.datastructures.Join`
+# which is used has a join descriptor by `django.db.models.sql.query.Query`.
+# It is responsible for producing the SQL code associated with the join,
+# making it easy to change in order to do a custom join condition.
+class PlayerLookupJoin(object):
+    def __init__(self, parent_alias, condition, params):
+        # Join table
+        self.table_name = 'chs_player'
+        self.parent_alias = parent_alias
+        # Note: table_alias is not necessarily known at instantiation time.
+        self.table_alias = None
+        # LOUTER or INNER
+        self.join_type = INNER
+        # Is this join nullabled?
+        self.nullable = False
+        # Custom join condition. Takes the table alias to use as parameters.
+        self.condition = condition
+        # parameters for join condition
+        self.params = params
+
+    def as_sql(self, compiler, connection):
+        qn = compiler.quote_name_unless_alias
+
+        condition = '%s.white_id = %s.object_id OR %s.black_id = %s.object_id'
+        condition = condition % (
+            qn(self.parent_alias),
+            qn(self.table_alias),
+            qn(self.parent_alias),
+            qn(self.table_alias),
+        )
+
+        custom_condition = self.condition(qn(self.table_alias))
+        params = self.params
+
+        on_clause_sql = '(%s) AND (%s)' % (condition, custom_condition)
+
+        alias_str = '' if self.table_alias == self.table_name else (' %s' % self.table_alias)
+        sql = '%s %s%s ON (%s)' % (self.join_type, qn(self.table_name), alias_str, on_clause_sql)
+        return sql, params
+
+    def relabeled_clone(self, change_map):
+        new_parent_alias = change_map.get(self.parent_alias, self.parent_alias)
+        new_table_alias = change_map.get(self.table_alias, self.table_alias)
+        return self.__class__(
+            self.table_name, new_parent_alias, new_table_alias, self.join_type,
+            self.join_field, self.nullable)
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return (
+                self.table_name == other.table_name and
+                self.parent_alias == other.parent_alias
+            )
+        return False
+
+    def demote(self):
+        new = self.relabeled_clone({})
+        new.join_type = INNER
+        return new
+
+    def promote(self):
+        new = self.relabeled_clone({})
+        new.join_type = LOUTER
+        return new
 
 
 class GameList(PaginatedListView):
@@ -89,7 +177,7 @@ class GameList(PaginatedListView):
         def is_set(attr):
             return attr in query and query[attr]
 
-        result = models.Game.objects
+        result = models.Game.objects.all()
         if is_set('result'):
             result = result.filter(result=query['result'])
         if is_set('location'):
@@ -114,16 +202,6 @@ class GameList(PaginatedListView):
             )
         if is_set('black_nat'):
             result = result.filter(white__nationality=query['black_nat'])
-        if is_set('player'):
-            result = result.filter(
-                Q(white__lastname__icontains=query['player'])
-                | Q(black__lastname__icontains=query['player'])
-            )
-        if is_set('player_nat'):
-            result = result.filter(
-                Q(white__nationality=query['player_nat'])
-                | Q(black__nationality=query['player_nat'])
-            )
         if is_set('opening'):
             try:
                 opening = models.Opening.objects.get(
@@ -135,6 +213,28 @@ class GameList(PaginatedListView):
         if is_set('moves'):
             moves = pgn.encode_moves_from_uci(query['moves'].split(','))
             result = result.filter(moves__chs_startswith=moves)
+        if is_set('player'):
+            def condition(table):
+                sql = 'UPPER(%s.lastname) = UPPER(%s) OR UPPER(%s.firstname) = UPPER(%s)'
+                return sql % (table, '%s', table, '%s')
+
+            join = PlayerLookupJoin(
+                result.query.get_initial_alias(),
+                condition,
+                [query['player'], query['player']]
+            )
+            result.query.join(join, [])
+        if is_set('player_nat'):
+            def condition(table):
+                sql = '%s.nationality = %s'
+                return sql % (table, '%s')
+
+            join = PlayerLookupJoin(
+                result.query.get_initial_alias(),
+                condition,
+                [query['player_nat']]
+            )
+            result.query.join(join, [])
         return result.order_by('start_date')
 
     def get_context_data(self, **kwargs):
@@ -250,6 +350,26 @@ def create_opening(request):
     return render(request, 'chs/opening_create.html')
 
 
+def edit_game(request, pk):
+    game = get_object_or_404(models.Game, object_id=pk)
+    return render(request, 'chs/game_create.html', {'game': game})
+
+
+def edit_player(request, pk):
+    player = get_object_or_404(models.Player, object_id=pk)
+    return render(request, 'chs/player_create.html', {'player': player})
+
+
+def edit_event(request, pk):
+    event = get_object_or_404(models.Event, object_id=pk)
+    return render(request, 'chs/event_create.html', {'event': event})
+
+
+def edit_opening(request, pk):
+    opening = get_object_or_404(models.Opening, object_id=pk)
+    return render(request, 'chs/opening_create.html', {'opening': opening})
+
+
 def add_game(request):
     try:
         account = models.Account.objects.get(id=request.session['account'])
@@ -257,49 +377,47 @@ def add_game(request):
         return render(request, 'chs/error.html', {
             'error': "incorrect login informations"
         })
+    if 'id' in request.POST and request.POST['id']:
+        game = get_object_or_404(models.Game, object_id=request.POST['id'])
+        if not account.has_edit_rights(game):
+            return render(request, 'chs/error.html', {
+                'error': "you can not edit this object"
+            })
+    else:
+        obj = models.create_obj(account)
+        game = models.Game(object=obj)
+
     if not (request.POST['moves'] and request.POST['result']):
         return render(request, 'chs/error.html', {
             'error': "missing game information"
         })
-    moves = pgn.encode_moves_from_uci(request.POST['moves'].split(','))
-    result = request.POST['result']
+    game.moves = pgn.encode_moves_from_uci(request.POST['moves'].split(','))
+    game.result = request.POST['result']
     if request.POST['event']:
-        event = models.find_or_add_event(request.POST['event'], account)
+        game.event = models.find_or_add_event(request.POST['event'], account)
     else:
-        event = None
-    location = request.POST.get('location')
-    if not location:
-        location = None
-    date = request.POST.get('date')
-    if not date:
-        date = None
+        game.event = None
+    game.location = request.POST.get('location')
+    if not game.location:
+        game.location = None
+    game.date = request.POST.get('date')
+    if not game.date:
+        game.date = None
 
     white_fn = request.POST.get('white_first', "")
     white_ln = request.POST.get('white_last', "")
     if white_fn or white_ln:
-        white = models.find_or_add_player(white_fn, white_ln, account)
+        game.white = models.find_or_add_player(white_fn, white_ln, account)
     else:
-        white = None
+        game.white = None
 
     black_fn = request.POST.get('black_first', "")
     black_ln = request.POST.get('black_last', "")
     if black_fn or black_ln:
-        black = models.find_or_add_player(black_fn, black_ln, account)
+        game.black = models.find_or_add_player(black_fn, black_ln, account)
     else:
-        black = None
+        game.black = None
 
-    obj = models.Object(owner=account)
-    obj.save()
-    game = models.Game(
-        object=obj,
-        moves=moves,
-        white=white,
-        black=black,
-        result=result,
-        event=event,
-        location=location,
-        start_date=date
-    )
     game.save()
     return HttpResponseRedirect(reverse('chess:game_list'))
 
@@ -326,24 +444,25 @@ def add_player(request):
         return render(request, 'chs/error.html', {
             'error': "incorrect login informations"
         })
-    firstname = request.POST.get('firstname', "")
-    lastname = request.POST.get('lastname', "")
-    elo = request.POST.get('elo')
-    if not elo:
-        elo = None
-    nationality = request.POST.get('nationality')
-    if not nationality:
-        nationality = None
+    if 'id' in request.POST and request.POST['id']:
+        player = get_object_or_404(models.Player, object_id=request.POST['id'])
+        if not account.has_edit_rights(player):
+            return render(request, 'chs/error.html', {
+                'error': "you can not edit this object"
+            })
+    else:
+        obj = models.create_obj(account)
+        player = models.Player(object=obj)
 
-    obj = models.Object(owner=account)
-    obj.save()
-    player = models.Player(
-        object=obj,
-        firstname=firstname,
-        lastname=lastname,
-        elo_rating=elo,
-        nationality=nationality
-    )
+    player.firstname = request.POST.get('firstname', "")
+    player.lastname = request.POST.get('lastname', "")
+    player.elo_rating = request.POST.get('elo')
+    if not player.elo_rating:
+        player.elo_rating = None
+    player.nationality = request.POST.get('nationality')
+    if not player.nationality:
+        player.nationality = None
+
     player.save()
     return HttpResponseRedirect(reverse('chess:player_list'))
 
@@ -355,32 +474,27 @@ def add_event(request):
         return render(request, 'chs/error.html', {
             'error': "incorrect login informations"
         })
-    name = request.POST['event_name']
-    location = request.POST.get("location")
-    if not location:
-        location = None
-    elo = request.POST.get('elo')
-    if not elo:
-        elo = None
-    nationality = request.POST.get('nationality')
-    if not nationality:
-        nationality = None
-    start_date = request.POST.get('start_date')
-    if not start_date:
-        start_date = None
-    end_date = request.POST.get('end_date')
-    if not end_date:
-        end_date = None
+    if 'id' in request.POST and request.POST['id']:
+        event = get_object_or_404(models.Event, object_id=request.POST['id'])
+        if not account.has_edit_rights(event):
+            return render(request, 'chs/error.html', {
+                'error': "you can not edit this object"
+            })
+    else:
+        obj = models.create_obj(account)
+        event = models.Event(object=obj)
 
-    obj = models.Object(owner=account)
-    obj.save()
-    event = models.Event(
-        object=obj,
-        event_name=name,
-        location=location,
-        start_date=start_date,
-        end_date=end_date
-    )
+    event.event_name = request.POST['event_name']
+    event.location = request.POST.get("location")
+    if not event.location:
+        event.location = None
+    event.start_date = request.POST.get('start_date')
+    if not event.start_date:
+        event.start_date = None
+    event.end_date = request.POST.get('end_date')
+    if not event.end_date:
+        event.end_date = None
+
     event.save()
     return HttpResponseRedirect(reverse('chess:event_list'))
 
@@ -392,29 +506,98 @@ def add_opening(request):
         return render(request, 'chs/error.html', {
             'error': "incorrect login informations"
         })
+    if 'id' in request.POST and request.POST['id']:
+        opening = get_object_or_404(models.Opening, object_id=request.POST['id'])
+        if not account.has_edit_rights(opening):
+            return render(request, 'chs/error.html', {
+                'error': "you can not edit this object"
+            })
+        new = False
+    else:
+        obj = models.create_obj(account)
+        opening = models.Opening(object=obj)
+        new = True
+
     if not (request.POST['moves']):
         return render(request, 'chs/error.html', {
             'error': "missing game information"
         })
-    moves = pgn.encode_moves_from_uci(request.POST['moves'].split(','))
+    opening.moves = pgn.encode_moves_from_uci(request.POST['moves'].split(','))
     if not (request.POST['opening_name']):
         return render(request, 'chs/error.html', {
             'error': "missing opening name"
         })
-    name = request.POST['opening_name']
-    if models.Opening.objects.filter(opening_name=name).exists():
+    opening.opening_name = request.POST['opening_name']
+    if new and models.Opening.objects.filter(opening_name=opening.opening_name).exists():
         return render(request, 'chs/error.html', {
             'error': "opening name already used"
         })
 
-    obj = models.Object(owner=account)
-    obj.save()
-    opening = models.Opening(
-        object=obj,
-        moves=moves,
-        opening_name=name
-    )
     opening.save()
+    return HttpResponseRedirect(reverse('chess:opening_list'))
+
+
+def delete_game(request, pk):
+    try:
+        account = models.Account.objects.get(id=request.session['account'])
+    except (KeyError, models.Account.DoesNotExist):
+        return render(request, 'chs/error.html', {
+            'error': "incorrect login informations"
+        })
+    game = get_object_or_404(models.Game, object_id=pk)
+    if not account.has_edit_rights(game):
+        return render(request, 'chs/error.html', {
+            'error': "you can not delete this object"
+        })
+    game.delete()
+    return HttpResponseRedirect(reverse('chess:game_list'))
+
+
+def delete_player(request, pk):
+    try:
+        account = models.Account.objects.get(id=request.session['account'])
+    except (KeyError, models.Account.DoesNotExist):
+        return render(request, 'chs/error.html', {
+            'error': "incorrect login informations"
+        })
+    player = get_object_or_404(models.Player, object_id=pk)
+    if not account.has_edit_rights(player):
+        return render(request, 'chs/error.html', {
+            'error': "you can not delete this object"
+        })
+    player.delete()
+    return HttpResponseRedirect(reverse('chess:player_list'))
+
+
+def delete_event(request, pk):
+    try:
+        account = models.Account.objects.get(id=request.session['account'])
+    except (KeyError, models.Account.DoesNotExist):
+        return render(request, 'chs/error.html', {
+            'error': "incorrect login informations"
+        })
+    event = get_object_or_404(models.Event, object_id=pk)
+    if not account.has_edit_rights(event):
+        return render(request, 'chs/error.html', {
+            'error': "you can not delete this object"
+        })
+    event.delete()
+    return HttpResponseRedirect(reverse('chess:event_list'))
+
+
+def delete_opening(request, pk):
+    try:
+        account = models.Account.objects.get(id=request.session['account'])
+    except (KeyError, models.Account.DoesNotExist):
+        return render(request, 'chs/error.html', {
+            'error': "incorrect login informations"
+        })
+    opening = get_object_or_404(models.Opening, object_id=pk)
+    if not account.has_edit_rights(opening):
+        return render(request, 'chs/error.html', {
+            'error': "you can not delete this object"
+        })
+    opening.delete()
     return HttpResponseRedirect(reverse('chess:opening_list'))
 
 
@@ -468,7 +651,11 @@ def handle_login(request):
                 'error': "incorrect username or password"
             })
         request.session['account'] = account.id
-        return HttpResponseRedirect(reverse('chess:mainpage'))
+        if 'next' in request.POST:
+            path = request.POST['next']
+        else:
+            path = '/'
+        return HttpResponseRedirect(path)
     except models.Account.DoesNotExist:
         return render(request, 'chs/login.html', {
             'error': "incorrect username or password"
@@ -481,7 +668,11 @@ def logout(request):
     except KeyError:
         pass
     request.session.flush()
-    return HttpResponseRedirect(reverse('chess:mainpage'))
+    if 'next' in request.GET:
+        path = request.GET['next']
+    else:
+        path = '/'
+    return HttpResponseRedirect(path)
 
 
 def register(request):
@@ -493,13 +684,9 @@ def handle_register(request):
         return render(request, 'chs/register.html', {
             'error': "missing username"
         })
-    if not request.POST['password'] or not request.POST['password2']:
+    if not request.POST['password']:
         return render(request, 'chs/register.html', {
             'error': "missing password"
-        })
-    if request.POST['password'] != request.POST['password2']:
-        return render(request, 'chs/register.html', {
-            'error': "passwords do not match"
         })
     if models.Account.objects.filter(pseudo=request.POST['account']).exists():
         return render(request, 'chs/register.html', {
@@ -511,7 +698,11 @@ def handle_register(request):
     )
     account.save()
     request.session['account'] = account.id
-    return HttpResponseRedirect(reverse('chess:mainpage'))
+    if 'next' in request.POST:
+        path = request.POST['next']
+    else:
+        path = '/'
+    return HttpResponseRedirect(path)
 
 
 def mainpage(request):
