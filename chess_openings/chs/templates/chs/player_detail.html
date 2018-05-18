@@ -1,11 +1,11 @@
 {% extends "chs/base.html" %}
 
-{% block title %}{{player}}{% endblock %}
+{% block title %}{{player.firstname}} {{player.lastname}}{% endblock %}
 
 {% block content %}
-<h1>{{player}}</h1>
+<h1>{{player.firstname}} {{player.lastname}}</h1>
 
-{% if player.elo_rating %}(Elo: {{player.elo_rating}}){% endif %}
+{% if player.elo_rating %}Elo: {{player.elo_rating}}{% endif %}
 {% if player.nationality %}, {{player.nationality}}{% endif %}
 
 <h3>Games list</h3>

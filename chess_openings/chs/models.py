@@ -13,7 +13,7 @@ class Account(models.Model):
     pseudo = models.CharField(max_length=20, unique=True, db_index=True)
     password = models.BinaryField(max_length=64)
     salt = models.BinaryField(max_length=64)
-    admin = models.BooleanField(default=False, db_index=True)
+    admin = models.BooleanField(default=False)
     can_edit = models.ManyToManyField('Object')
 
     def __str__(self):

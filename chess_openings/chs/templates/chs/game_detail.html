@@ -106,11 +106,9 @@ update(false);
 </script>
 
 <h3>Openings</h3>
-<ul>
-{% for opening in openings %}
-  <li><a href="{% url 'chess:opening' opening.object_id %}">{{ opening }}</a></li>
-{% endfor %}
-</ul>
+{% with opening_list=openings %}
+{% include "chs/opening_table.html" %}
+{% endwith %}
 
 {% include "chs/comments.html" %}
 {% if can_edit %}
