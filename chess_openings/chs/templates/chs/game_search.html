@@ -16,12 +16,10 @@
 
 <section>
 <form action="{% url 'chess:game_list' %}" method="get">
-  <div id="board" style="width: 400px"></div>
+  <fieldset> <legend>Game search</legend>
+  <div id="board" style="width: 400px">
   <p id="moves_text"></p>
   <input type="hidden" id="moves_input" name="moves"/>
-  <button type="button" onclick="undo()">Undo</button>
-  <button type="button" onclick="reset_board()">Reset</button>
-  <br/>
   <script>
   var game = new Chess();
   var moves_text = document.getElementById("moves_text")
@@ -80,21 +78,25 @@
 
   updateStatus();
   </script>
+  <ul class="move-menu">
+    <li class="prev"> <button type="button" onclick="undo();">Undo</button> </li>
+    <li class="next"><button type="button" onclick="reset_board()">Reset</button> </li>
+</ul>
+</div>
 
-  Player <br/>
-  name:<input name="player"/> nationality:<input name="player_nat"/><br/>
-  White <br/>
-  name:<input name="white"/> nationality:<input name="white_nat"/><br/>
-  Black <br/>
-  name:<input name="black"/> nationality:<input name="black_nat"/><br/>
-  Event <br/>
-  <input name="event"/><br/>
-  Site <br/>
-  <input name="location"/><br/>
-  Opening <br/>
-  <input name="opening"/><br/>
-  After:<input type="date" name="after"/> Before:<input type="date" name="before"/><br/>
+  <label for="player">Player name:</label><input name="player"/> 
+  <label for="player_nat">nationality:</label><input name="player_nat"/><br/>
+  <label for="white">White name:</label><input name="white"/> 
+  <label for="white_nat">nationality:</label><input name="white_nat"/><br/>
+  <label for="black">Black name:</label><input name="black"/> 
+  <label for="black_nat">nationality:</label><input name="black_nat"/><br/>
+  <label for="event">Event</label><input name="event"/><br/>
+  <label for="location">Site</label><input name="location"/><br/>
+  <label for="opening">Opening</label><input name="opening"/><br/>
+  <label for="after">After:</label><input type="date" name="after"/>
+  <label for="before">Before:</label><input type="date" name="before"/><br/>
   <input type="submit" value="Search"/>
+  </fieldset>
 </form>
 </section>
 {% endblock %}
