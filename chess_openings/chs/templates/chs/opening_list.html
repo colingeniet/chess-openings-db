@@ -6,13 +6,15 @@
 <nav> </nav>
 
 <section>
-<script>active_navlink("nav_openings");</script>
-<a href="{% url 'chess:opening_search' %}">search</a>
-{% if request.session.account %}
-<a href="{% url 'chess:opening_create' %}">create</a>
-{% endif %}
-{% include "chs/paginator.html" %}
-{% include "chs/opening_table.html" %}
-{% include "chs/paginator.html" %}
+  <h1>Openings list</h1>
+  <script>active_navlink("nav_openings");</script>
+  You can also <a href="{% url 'chess:opening_search' %}">search</a>
+  {% if request.session.account %}
+    or <a href="{% url 'chess:opening_create' %}">create</a>
+  {% endif %}
+  openings.
+  {% include "chs/paginator.html" %}
+  {% include "chs/opening_table.html" %}
+  {% include "chs/paginator.html" %}
 </section>
 {% endblock %}
