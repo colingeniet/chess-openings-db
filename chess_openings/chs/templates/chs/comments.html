@@ -1,8 +1,10 @@
 <h2> Comments </h1>
 {% for comment in object.object.comments %}
-<h4>{{comment.account.pseudo}}</h4>
-<span>{{comment.time}}</span>
-<p>{{comment.text}}</p>
+<div class="comment">
+  <h4>{{comment.account.pseudo}}</h4>
+  <p>{{comment.text}}</p>
+  <div class="hour">{{comment.time}}</div>
+</div>
 {% endfor %}
 
 {% if request.session.account %}
