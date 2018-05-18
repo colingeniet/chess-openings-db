@@ -129,7 +129,7 @@ flex-wrap:wrap}
 .move-menu li {
 margin-bottom:-1px}
 
-.move-menu li a {
+.move-menu li button {
     display:block;
     text-align:center;
     text-decoration:none;
@@ -141,11 +141,16 @@ margin-bottom:-1px}
     transition:all .15s ease;
 }
 
-.move-menu li a:focus,.move-menu li a:hover {
+button {
+    border: none;
+    cursor: pointer;
+}
+
+.move-menu li button:focus,.move-menu li button:hover {
     background:#d2d5d6;
 }
 
-.move-menu li.next a,.move-menu li.prev a,.move-menu li.reset a {
+.move-menu li.next button,.move-menu li.prev button,.move-menu li.reset button {
     padding:0 15px;
 }
 
@@ -154,7 +159,8 @@ margin-bottom:-1px}
 }
 
 .move-menu li.next {
-    margin-left:auto;
+    margin-left: auto;
+    margin-right: 6px;
 }
 
 .move-menu li.next .ico-after {
@@ -183,19 +189,25 @@ legend {
     font-weight:bold;
 }
 
-input {
-    width: 300px;
+input, textarea {
+    min-width: 100px;
+    width: 20%;
     height: 25px;
     border:1px solid #F5C5C5;
     border-radius:5px;
-    /*box-shadow:1px 1px 2px #C0C0C0 inset;
-    */
+    font-size: 1.7vmin;
+    /*box-shadow:1px 1px 2px #C0C0C0 inset; */
+}
+
+textarea {
+  width: 100%;
+  height: 200px;
 }
 
 label {
     display: inline-block;
     width: 200px;
-    padding: 10px 0px 10px 40px;
+    padding: 10px 0px 10px 2%;
 }
 
 input[type=submit], input[type=reset] {
@@ -206,6 +218,15 @@ input[type=submit], input[type=reset] {
     box-shadow:1px 1px 1px #D83F3D;
     cursor:pointer;
     font-size: 1.7vmin;
+}
+
+input[type=file] {
+    width: 350px;
+    height: 30px;
+}
+
+input[type=date] {
+  width: 150px;
 }
 
 input[type="submit"]:hover {
