@@ -73,6 +73,10 @@
         updateStatus();
       }
 
+      function onSnapEnd() {
+        board.position(game.fen());
+      }
+
       function updateStatus() {
         moves_text.innerHTML = game.pgn();
         moves_input.value = game.history({verbose: true}).map(
